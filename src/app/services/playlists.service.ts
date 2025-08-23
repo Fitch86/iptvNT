@@ -227,19 +227,18 @@ export class PlaylistsService {
         path?: string  
     ) {  
         try {  
-            // 在解析前预处理 M3U 数据，移除问题条目  
-            const cleanedPlaylist = this.preprocessM3UData(playlist);  
+            // 预处理 M3U 数据，移除时间戳条目  
+            const cleanedPlaylist = this.cleanM3UData(playlist);  
             const parsedPlaylist = parse(cleanedPlaylist);  
               
-            // 进一步清理解析后的数据  
+            // 二次过滤，确保所有频道都有有效的 group.title  
             parsedPlaylist.items = parsedPlaylist.items.filter(item => {  
-                // 确保所有必需字段存在且不为 undefined  
                 return item &&   
                        item.name &&   
                        item.url &&   
                        item.group &&   
-                       item.group.title !== undefined &&  
-                       item.group.title !== '更新时间';  
+                       typeof item.group.title === 'string' &&  
+                       item.group.title.trim() !== '';  
             });  
               
             return createPlaylistObject(  
@@ -257,20 +256,21 @@ export class PlaylistsService {
             throw new Error(`Parsing failed, not a valid playlist: ${error}`);  
         }  
     }  
-  
-    private preprocessM3UData(playlist: string): string {  
-        // 移除时间戳条目和其他问题行  
+      
+    private cleanM3UData(playlist: string): string {  
         const lines = playlist.split('\n');  
         const cleanedLines = [];  
         let skipNext = false;  
           
         for (let i = 0; i < lines.length; i++) {  
-            const line = lines[i];  
+            const line = lines[i].trim();  
               
-            // 检查是否是时间戳条目  
+            // 跳过时间戳相关的条目  
             if (line.includes('group-title="更新时间"') ||   
-                line.includes('tvg-id="更新时间"')) {  
-                skipNext = true; // 跳过下一行（URL行）  
+                line.includes('tvg-id="更新时间"') ||  
+                line.includes('tvg-name="2025-') ||  
+                line.match(/tvg-name="\d{4}-\d{2}-\d{2}/)) {  
+                skipNext = true;  
                 continue;  
             }  
               
@@ -279,7 +279,13 @@ export class PlaylistsService {
                 continue;  
             }  
               
-            cleanedLines.push(line);  
+            // 确保每个 EXTINF 行都有 group-title  
+            if (line.startsWith('#EXTINF:') && !line.includes('group-title=')) {  
+                const modifiedLine = line.replace(/,\s*([^,]+)$/, ' group-title="未分类", $1');  
+                cleanedLines.push(modifiedLine);  
+            } else {  
+                cleanedLines.push(line);  
+            }  
         }  
           
         return cleanedLines.join('\n');  
