@@ -67,10 +67,18 @@ export class ChannelListContainerComponent {
         return this._channelList;
     }
 
-    @Input('channelList')
-    set channelList(value: Channel[]) {
-        this._channelList = value;
-        this.groupedChannels = _.default.groupBy(value, 'group.title');
+    @Input('channelList')  
+    set channelList(value: Channel[]) {  
+        // 过滤掉可能有问题的频道  
+        const validChannels = value?.filter(channel =>   
+            channel &&   
+            channel.group &&   
+            channel.group.title !== undefined &&  
+            channel.name !== undefined  
+        ) || [];  
+          
+        this._channelList = validChannels;  
+        this.groupedChannels = _.default.groupBy(validChannels, 'group.title');  
     }
 
     /** Object with channels sorted by groups */
