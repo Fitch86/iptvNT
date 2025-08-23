@@ -70,22 +70,26 @@ export class ChannelListContainerComponent {
     @Input('channelList')  
     set channelList(value: Channel[]) {  
         // 过滤掉有问题的频道，确保所有必需字段存在  
-        const validChannels = (value || []).filter(channel =>   
-            this.isValidChannel(channel)  
-        );  
+        const validChannels = (value || []).filter(channel => {  
+            // 确保频道对象存在  
+            if (!channel) return false;  
+              
+            // 确保基本字段存在  
+            if (!channel.name || !channel.url) return false;  
+              
+            // 确保 group 对象存在且 title 是有效字符串  
+            if (!channel.group ||   
+                typeof channel.group.title !== 'string' ||   
+                channel.group.title.trim() === '') {  
+                // 为没有有效 group.title 的频道设置默认值  
+                channel.group = { title: '未分类' };  
+            }  
+              
+            return true;  
+        });  
           
         this._channelList = validChannels;  
         this.groupedChannels = _.default.groupBy(validChannels, 'group.title');  
-    }  
-      
-    // 添加类型守卫方法  
-    private isValidChannel(channel: any): channel is Channel {  
-        return channel &&   
-               typeof channel.name === 'string' &&  
-               typeof channel.url === 'string' &&  
-               channel.group &&  
-               typeof channel.group.title === 'string' &&  
-               channel.group.title.trim() !== '';  
     }
 
     /** Object with channels sorted by groups */
