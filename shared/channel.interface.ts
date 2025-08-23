@@ -30,12 +30,3 @@ export interface Channel {
     };
     radio: string;
 }
-
-// 在频道列表组件中添加类型守卫  
-private isValidChannel(channel: any): channel is Channel {  
-    return channel &&   
-           typeof channel.name === 'string' &&  
-           typeof channel.url === 'string' &&  
-           channel.group &&  
-           typeof channel.group.title === 'string';  
-}
