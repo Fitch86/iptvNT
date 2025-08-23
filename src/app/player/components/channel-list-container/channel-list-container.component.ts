@@ -69,16 +69,23 @@ export class ChannelListContainerComponent {
 
     @Input('channelList')  
     set channelList(value: Channel[]) {  
-        // 过滤掉可能有问题的频道  
-        const validChannels = value?.filter(channel =>   
-            channel &&   
-            channel.group &&   
-            channel.group.title !== undefined &&  
-            channel.name !== undefined  
-        ) || [];  
+        // 过滤掉有问题的频道，确保所有必需字段存在  
+        const validChannels = (value || []).filter(channel =>   
+            this.isValidChannel(channel)  
+        );  
           
         this._channelList = validChannels;  
         this.groupedChannels = _.default.groupBy(validChannels, 'group.title');  
+    }  
+      
+    // 添加类型守卫方法  
+    private isValidChannel(channel: any): channel is Channel {  
+        return channel &&   
+               typeof channel.name === 'string' &&  
+               typeof channel.url === 'string' &&  
+               channel.group &&  
+               typeof channel.group.title === 'string' &&  
+               channel.group.title.trim() !== '';  
     }
 
     /** Object with channels sorted by groups */
