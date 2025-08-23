@@ -220,28 +220,69 @@ export class PlaylistsService {
         );
     }
 
-    handlePlaylistParsing(
-        uploadType: 'FILE' | 'URL' | 'TEXT',
-        playlist: string,
-        title: string,
-        path?: string
-    ) {
-        try {
-            const parsedPlaylist = parse(playlist);
-            return createPlaylistObject(
-                title,
-                parsedPlaylist,
-                path,
-                uploadType
-            );
-        } catch (error) {
-            this.snackBar.open(
-                this.translateService.instant('HOME.PARSING_ERROR'),
-                null,
-                { duration: 2000 }
-            ); // TODO: translate
-            throw new Error(`Parsing failed, not a valid playlist: ${error}`);
-        }
+    handlePlaylistParsing(  
+        uploadType: 'FILE' | 'URL' | 'TEXT',  
+        playlist: string,  
+        title: string,  
+        path?: string  
+    ) {  
+        try {  
+            // 在解析前预处理 M3U 数据，移除问题条目  
+            const cleanedPlaylist = this.preprocessM3UData(playlist);  
+            const parsedPlaylist = parse(cleanedPlaylist);  
+              
+            // 进一步清理解析后的数据  
+            parsedPlaylist.items = parsedPlaylist.items.filter(item => {  
+                // 确保所有必需字段存在且不为 undefined  
+                return item &&   
+                       item.name &&   
+                       item.url &&   
+                       item.group &&   
+                       item.group.title !== undefined &&  
+                       item.group.title !== '更新时间';  
+            });  
+              
+            return createPlaylistObject(  
+                title,  
+                parsedPlaylist,  
+                path,  
+                uploadType  
+            );  
+        } catch (error) {  
+            this.snackBar.open(  
+                this.translateService.instant('HOME.PARSING_ERROR'),  
+                null,  
+                { duration: 2000 }  
+            );  
+            throw new Error(`Parsing failed, not a valid playlist: ${error}`);  
+        }  
+    }  
+  
+    private preprocessM3UData(playlist: string): string {  
+        // 移除时间戳条目和其他问题行  
+        const lines = playlist.split('\n');  
+        const cleanedLines = [];  
+        let skipNext = false;  
+          
+        for (let i = 0; i < lines.length; i++) {  
+            const line = lines[i];  
+              
+            // 检查是否是时间戳条目  
+            if (line.includes('group-title="更新时间"') ||   
+                line.includes('tvg-id="更新时间"')) {  
+                skipNext = true; // 跳过下一行（URL行）  
+                continue;  
+            }  
+              
+            if (skipNext) {  
+                skipNext = false;  
+                continue;  
+            }  
+              
+            cleanedLines.push(line);  
+        }  
+          
+        return cleanedLines.join('\n');  
     }
 
     getPlaylistWithGlobalFavorites() {
