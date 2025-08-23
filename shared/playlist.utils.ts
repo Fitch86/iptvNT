@@ -62,31 +62,55 @@ export const getFilenameFromUrl = (value: string): string => {
  * @param urlOrPath absolute fs path or url of the playlist
  * @param uploadType upload type - by file or via an url
  */
-export const createPlaylistObject = (
-    name: string,
-    playlist: ParsedPlaylist,
-    urlOrPath?: string,
-    uploadType?: 'URL' | 'FILE' | 'TEXT'
-): Playlist => {
-    return {
-        _id: uuidv4(),
-        filename: name,
-        title: name,
-        count: playlist.items.length,
-        playlist: {
-            ...playlist,
-            items: playlist.items.map((item) => ({
-                id: uuidv4(),
-                ...item,
-            })),
-        },
-        importDate: new Date().toISOString(),
-        lastUsage: new Date().toISOString(),
-        favorites: [],
-        autoRefresh: false,
-        ...(uploadType === 'URL' ? { url: urlOrPath } : {}),
-        ...(uploadType === 'FILE' ? { filePath: urlOrPath } : {}),
-    };
+export const createPlaylistObject = (  
+    name: string,  
+    playlist: ParsedPlaylist,  
+    urlOrPath?: string,  
+    uploadType?: 'URL' | 'FILE' | 'TEXT'  
+): Playlist => {  
+    // 过滤掉时间戳条目和其他非标准条目  
+    const filteredItems = playlist.items.filter((item) => {  
+        // 过滤掉更新时间相关的条目  
+        if (item.group?.title === '更新时间' ||   
+            item.tvg?.id === '更新时间' ||  
+            item.name?.includes('更新时间')) {  
+            return false;  
+        }  
+          
+        // 确保必需字段存在  
+        if (!item.name || !item.url) {  
+            return false;  
+        }  
+          
+        // 过滤掉非直播流URL（如.mp4文件）  
+        if (item.url.includes('.mp4') ||   
+            item.url.includes('.avi') ||   
+            item.url.includes('.mkv')) {  
+            return false;  
+        }  
+          
+        return true;  
+    });  
+  
+    return {  
+        _id: uuidv4(),  
+        filename: name,  
+        title: name,  
+        count: filteredItems.length, // 使用过滤后的数量  
+        playlist: {  
+            ...playlist,  
+            items: filteredItems.map((item) => ({  
+                id: uuidv4(),  
+                ...item,  
+            })),  
+        },  
+        importDate: new Date().toISOString(),  
+        lastUsage: new Date().toISOString(),  
+        favorites: [],  
+        autoRefresh: false,  
+        ...(uploadType === 'URL' ? { url: urlOrPath } : {}),  
+        ...(uploadType === 'FILE' ? { filePath: urlOrPath } : {}),  
+    };  
 };
 
 export const getExtensionFromUrl = (url: string) => {
