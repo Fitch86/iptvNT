@@ -4,7 +4,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { parse } from 'iptv-playlist-parser';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
+//import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { Channel } from '../../../shared/channel.interface';
 import { GLOBAL_FAVORITES_PLAYLIST_ID } from '../../../shared/constants';
 import {
@@ -83,29 +85,17 @@ export class PlaylistsService {
         return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
             tap(result => {
                 console.log('Delete result:', result);
-                if (result !== undefined && result !== null) {
-                    console.log('Playlist successfully deleted:', playlistId);
-                }
             }),
-            retryWhen(errors => 
-                errors.pipe(
-                    tap(error => console.warn('Delete operation failed, will retry:', error.message)),
-                    delay(500),
-                    take(2)
-                )
-            ),
-            timeout(5000),
-            catchError(error => {  
-                console.error('Delete failed after all retries:', error);  
+            catchError((error: any) => {  
+                console.error('Delete failed:', error);  
                 
+                // 安全的错误处理
                 let userFriendlyMessage = '删除播放列表失败，请重试';
                 
-                if (error.name === 'TimeoutError') {
-                    userFriendlyMessage = '操作超时，请检查网络连接后重试';
-                } else if (error.name === 'DataError') {
-                    userFriendlyMessage = '数据库错误，该播放列表可能已被删除';
-                } else if (error.message && error.message.includes('invoke')) {
-                    userFriendlyMessage = '系统调用失败，请刷新页面后重试';
+                if (error && error.message) {
+                    if (error.message.includes('invoke')) {
+                        userFriendlyMessage = '系统调用失败，请刷新页面后重试';
+                    }
                 }
                 
                 return throwError(() => new Error(userFriendlyMessage));  
