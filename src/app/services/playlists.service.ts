@@ -53,20 +53,45 @@ export class PlaylistsService {
         }
     }
 
-    deletePlaylist(playlistId: string) {  
-        console.log('dbService status:', this.dbService);  
-        if (!this.dbService) {  
-            console.error('NgxIndexedDBService not available');  
-            return throwError(() => new Error('Database service not initialized'));  
-        }  
-        return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
-            tap(result => console.log('Delete result:', result)),  
-            catchError(error => {  
-                console.error('Delete failed:', error);  
-                return throwError(() => error);  
-            })  
-        );  
-    }
+    //deletePlaylist(playlistId: string) {  
+    //    console.log('dbService status:', this.dbService);  
+    //    if (!this.dbService) {  
+    //        console.error('NgxIndexedDBService not available');  
+    //        return throwError(() => new Error('Database service not initialized'));  
+    //    }  
+    //    return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
+    //        tap(result => console.log('Delete result:', result)),  
+    //        catchError(error => {  
+    //            console.error('Delete failed:', error);  
+    //            return throwError(() => error);  
+    //        })  
+    //    );  
+    //}
+    deletePlaylist(playlistId: string): Promise<void> {
+        try {
+          // 添加空值检查，确保 invoke 方法存在
+          if (typeof window !== 'undefined' && window.electronAPI?.invoke) {
+            // Electron 环境
+            await window.electronAPI.invoke('delete-playlist', playlistId);
+          } else if (this.database && typeof this.database.deletePlaylist === 'function') {
+            // PWA/Web 环境 - 使用 IndexedDB
+            await this.database.deletePlaylist(playlistId);
+          } else {
+            // 备用方案：直接操作本地数据
+            await this.deletePlaylistFromLocalStorage(playlistId);
+          }
+        } catch (error) {
+          console.error('Error deleting playlist:', error);
+          // 提供用户友好的错误提示
+          throw new Error('无法删除播放列表，请刷新页面后重试');
+        }
+      }
+    
+    private deletePlaylistFromLocalStorage(playlistId: string): Promise<void> {
+        const playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
+        const filteredPlaylists = playlists.filter((playlist: any) => playlist.id !== playlistId);
+        localStorage.setItem('playlists', JSON.stringify(filteredPlaylists));
+      }
     
     updatePlaylist(playlistId: string, updatedPlaylist: Playlist) {
         return this.getPlaylistById(playlistId).pipe(
