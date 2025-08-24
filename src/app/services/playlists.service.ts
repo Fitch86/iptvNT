@@ -53,10 +53,16 @@ export class PlaylistsService {
         }
     }
 
-    deletePlaylist(playlistId: string) {
-        return this.dbService.delete(DbStores.Playlists, playlistId);
+    deletePlaylist(playlistId: string) {  
+        return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
+            tap(result => console.log('Delete result:', result)),  
+            catchError(error => {  
+                console.error('Delete failed:', error);  
+                return throwError(error);  
+            })  
+        );  
     }
-
+    
     updatePlaylist(playlistId: string, updatedPlaylist: Playlist) {
         return this.getPlaylistById(playlistId).pipe(
             switchMap((currentPlaylist: Playlist) =>
