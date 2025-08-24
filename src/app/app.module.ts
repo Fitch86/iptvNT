@@ -51,7 +51,12 @@ export function DataFactory() {
         AppRoutingModule,
         BrowserAnimationsModule,
         BrowserModule,
-        NgxWhatsNewModule,
+        // Remove this conditional import  
+        AppConfig.environment === 'WEB'  
+            ? NgxIndexedDBModule.forRoot(dbConfig)  
+            : [],  
+        // Keep only this one  
+        NgxIndexedDBModule.forRoot(dbConfig),
         NgxIndexedDBModule.forRoot(dbConfig),
         NgxSkeletonLoaderModule.forRoot({
             animation: 'pulse',
