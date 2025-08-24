@@ -123,7 +123,7 @@ export class PlaylistsService {
         );  
     }*/
     // 临时删除方法 - 绕过 NgxIndexedDB 的问题
-    deletePlaylistTemporary(playlistId: string) {
+    deletePlaylist(playlistId: string) {
         // 方案1：使用原生 IndexedDB
         const request = indexedDB.open('YourDatabaseName', 1);
         
