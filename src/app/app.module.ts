@@ -56,7 +56,7 @@ export function DataFactory() {
             ? NgxIndexedDBModule.forRoot(dbConfig)  
             : [],  
         // Keep only this one  
-        NgxIndexedDBModule.forRoot(dbConfig),
+        NgxWhatsNewModule,
         NgxIndexedDBModule.forRoot(dbConfig),
         NgxSkeletonLoaderModule.forRoot({
             animation: 'pulse',
