@@ -4,10 +4,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { parse } from 'iptv-playlist-parser';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-//import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
-import { combineLatest, map, timer, Observable } from 'rxjs';
-import { switchMap, tap, catchError } from 'rxjs/operators';
-import { of, throwError } from 'rxjs';
+import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
+//import { combineLatest, map, timer, Observable } from 'rxjs';
+//import { switchMap, tap, catchError } from 'rxjs/operators';
+//import { of, throwError } from 'rxjs';
 import { Channel } from '../../../shared/channel.interface';
 import { GLOBAL_FAVORITES_PLAYLIST_ID } from '../../../shared/constants';
 import {
@@ -56,7 +56,7 @@ export class PlaylistsService {
         }
     }
 
-    /*deletePlaylist(playlistId: string) {  
+    deletePlaylist(playlistId: string) {  
         console.log('dbService status:', this.dbService);  
         if (!this.dbService) {  
             console.error('NgxIndexedDBService not available');  
@@ -69,7 +69,7 @@ export class PlaylistsService {
                 return throwError(() => error);  
             })  
         );  
-    }*/
+    }
     /*deletePlaylist(playlistId: string) {  
         console.log('dbService status:', this.dbService);  
         
@@ -123,7 +123,7 @@ export class PlaylistsService {
         );  
     }*/
     // 最简单的删除方法
-    deletePlaylist(playlistId: string): Observable<any> {
+    /*deletePlaylist(playlistId: string): Observable<any> {
         console.log('deletePlaylist called with ID:', playlistId);
         
         if (!playlistId) {
@@ -146,7 +146,7 @@ export class PlaylistsService {
             playlistId: playlistId,
             method: 'localStorage'
         });
-    }
+    }*/
      
     updatePlaylist(playlistId: string, updatedPlaylist: Playlist) {
         return this.getPlaylistById(playlistId).pipe(
