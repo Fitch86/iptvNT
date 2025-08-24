@@ -4,9 +4,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { parse } from 'iptv-playlist-parser';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
-//import { tap, catchError } from 'rxjs/operators';
-//import { throwError } from 'rxjs';
+//import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
+import { combineLatest, map, switchMap, timer } from 'rxjs';
+import { switchMap, tap, catchError } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
 import { Channel } from '../../../shared/channel.interface';
 import { GLOBAL_FAVORITES_PLAYLIST_ID } from '../../../shared/constants';
 import {
@@ -82,23 +83,42 @@ export class PlaylistsService {
             return throwError(() => new Error('Invalid playlist ID provided'));
         }
         
-        return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
+        // 添加延时，让数据库完全初始化
+        return timer(100).pipe(
+            switchMap(() => {
+                try {
+                    return this.dbService.delete(DbStores.Playlists, playlistId);
+                } catch (syncError) {
+                    console.error('Synchronous error in delete:', syncError);
+                    return throwError(() => syncError);
+                }
+            }),
             tap(result => {
                 console.log('Delete result:', result);
             }),
             catchError((error: any) => {  
                 console.error('Delete failed:', error);  
                 
-                // 安全的错误处理
-                let userFriendlyMessage = '删除播放列表失败，请重试';
-                
-                if (error && error.message) {
-                    if (error.message.includes('invoke')) {
-                        userFriendlyMessage = '系统调用失败，请刷新页面后重试';
+                // 如果是 invoke 错误，说明数据库未正确初始化
+                if (error.message && error.message.includes('invoke')) {
+                    console.error('Database invoke error detected - possible PWA/ServiceWorker conflict');
+                    
+                    // 尝试直接从 localStorage 删除作为备用方案
+                    try {
+                        const storedPlaylists = localStorage.getItem('playlists');
+                        if (storedPlaylists) {
+                            const playlists = JSON.parse(storedPlaylists);
+                            const filtered = playlists.filter((p: any) => p.id !== playlistId);
+                            localStorage.setItem('playlists', JSON.stringify(filtered));
+                            console.log('Fallback: Removed from localStorage');
+                            return of(true); // 返回成功
+                        }
+                    } catch (localStorageError) {
+                        console.error('localStorage fallback also failed:', localStorageError);
                     }
                 }
                 
-                return throwError(() => new Error(userFriendlyMessage));  
+                return throwError(() => new Error('删除失败，请刷新页面后重试'));  
             })  
         );  
     }
