@@ -67,7 +67,10 @@ export class PlaylistsService {
     //        })  
     //    );  
     //}
-    deletePlaylist(playlistId: string) {
+    // 在 src/app/services/playlist.service.ts 或相关服务文件中
+    export class PlaylistService {
+      
+      async deletePlaylist(playlistId: string): Promise<void> {
         try {
           // 添加空值检查，确保 invoke 方法存在
           if (typeof window !== 'undefined' && window.electronAPI?.invoke) {
@@ -87,11 +90,12 @@ export class PlaylistsService {
         }
       }
     
-    private deletePlaylistFromLocalStorage(playlistId: string) {
+      private async deletePlaylistFromLocalStorage(playlistId: string): Promise<void> {
         const playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
         const filteredPlaylists = playlists.filter((playlist: any) => playlist.id !== playlistId);
         localStorage.setItem('playlists', JSON.stringify(filteredPlaylists));
       }
+    }
     
     updatePlaylist(playlistId: string, updatedPlaylist: Playlist) {
         return this.getPlaylistById(playlistId).pipe(
