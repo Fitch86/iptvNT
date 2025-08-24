@@ -51,9 +51,6 @@ export function DataFactory(dbService: NgxIndexedDBService, http: HttpClient) {
         AppRoutingModule,
         BrowserAnimationsModule,
         BrowserModule,
-        AppConfig.environment === 'WEB'
-            ? NgxIndexedDBModule.forRoot(dbConfig)
-            : [],
         NgxWhatsNewModule,
         NgxIndexedDBModule.forRoot(dbConfig),
         NgxSkeletonLoaderModule.forRoot({
