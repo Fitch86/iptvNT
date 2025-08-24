@@ -54,6 +54,10 @@ export class PlaylistsService {
     }
 
     deletePlaylist(playlistId: string) {  
+        if (!this.dbService) {  
+            console.error('Database service not available');  
+            return throwError('Database service not initialized');  
+        }  
         return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
             tap(result => console.log('Delete result:', result)),  
             catchError(error => {  
