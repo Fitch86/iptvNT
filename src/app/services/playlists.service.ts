@@ -123,7 +123,7 @@ export class PlaylistsService {
         );  
     }*/
     // 在 playlists.service.ts 中添加这个简单的删除方法
-    deletePlaylist(playlistId: string): ObservableInput<any> {
+    deletePlaylist(playlistId: string): Observable<any> {
         // 直接返回成功的 Observable，同时在后台尝试删除
         setTimeout(() => {
             try {
