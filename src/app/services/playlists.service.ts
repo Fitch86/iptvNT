@@ -67,7 +67,7 @@ export class PlaylistsService {
     //        })  
     //    );  
     //}
-    deletePlaylist(playlistId: string): Promise<void> {
+    deletePlaylist(playlistId: string) {
         try {
           // 添加空值检查，确保 invoke 方法存在
           if (typeof window !== 'undefined' && window.electronAPI?.invoke) {
@@ -87,7 +87,7 @@ export class PlaylistsService {
         }
       }
     
-    private deletePlaylistFromLocalStorage(playlistId: string): Promise<void> {
+    private deletePlaylistFromLocalStorage(playlistId: string) {
         const playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
         const filteredPlaylists = playlists.filter((playlist: any) => playlist.id !== playlistId);
         localStorage.setItem('playlists', JSON.stringify(filteredPlaylists));
