@@ -70,7 +70,7 @@ export class PlaylistsService {
             })  
         );  
     }*/
-    deletePlaylist(playlistId: string) {  
+    /*deletePlaylist(playlistId: string) {  
         console.log('dbService status:', this.dbService);  
         
         if (!this.dbService) {  
@@ -121,6 +121,45 @@ export class PlaylistsService {
                 return throwError(() => new Error('删除失败，请刷新页面后重试'));  
             })  
         );  
+    }*/
+    // 临时删除方法 - 绕过 NgxIndexedDB 的问题
+    deletePlaylistTemporary(playlistId: string) {
+        // 方案1：使用原生 IndexedDB
+        const request = indexedDB.open('YourDatabaseName', 1);
+        
+        request.onsuccess = (event: any) => {
+            const db = event.target.result;
+            const transaction = db.transaction(['playlists'], 'readwrite');
+            const store = transaction.objectStore('playlists');
+            
+            const deleteRequest = store.delete(playlistId);
+            
+            deleteRequest.onsuccess = () => {
+                console.log('Direct IndexedDB delete successful');
+                // 更新UI
+            };
+            
+            deleteRequest.onerror = () => {
+                console.error('Direct IndexedDB delete failed');
+            };
+        };
+        
+        request.onerror = () => {
+            console.error('Failed to open IndexedDB directly');
+            // 备用方案：使用 localStorage
+            this.deleteFromLocalStorage(playlistId);
+        };
+    }
+    
+    private deleteFromLocalStorage(playlistId: string) {
+        try {
+            const playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
+            const filtered = playlists.filter((p: any) => p.id !== playlistId);
+            localStorage.setItem('playlists', JSON.stringify(filtered));
+            console.log('Deleted from localStorage as fallback');
+        } catch (error) {
+            console.error('localStorage fallback failed:', error);
+        }
     }
      
     updatePlaylist(playlistId: string, updatedPlaylist: Playlist) {
