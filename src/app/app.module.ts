@@ -37,11 +37,11 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 /**
  * Conditionally imports the necessary service based on the current environment
  */
-export function DataFactory(dbService: NgxIndexedDBService, http: HttpClient) {  
+export function DataFactory() {  
     if (isTauri()) {  
         return new TauriService();  
     }  
-    return new PwaService(dbService, http);  
+    return new PwaService();  
 }
 
 @NgModule({
