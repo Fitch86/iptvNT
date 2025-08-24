@@ -52,9 +52,9 @@ export function DataFactory() {
         BrowserAnimationsModule,
         BrowserModule,
         // Remove this conditional import  
-        AppConfig.environment === 'WEB'  
-            ? NgxIndexedDBModule.forRoot(dbConfig)  
-            : [],  
+        //AppConfig.environment === 'WEB'  
+        //    ? NgxIndexedDBModule.forRoot(dbConfig)  
+        //    : [],  
         // Keep only this one  
         NgxWhatsNewModule,
         NgxIndexedDBModule.forRoot(dbConfig),
