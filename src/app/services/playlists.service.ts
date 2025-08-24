@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { parse } from 'iptv-playlist-parser';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 //import { combineLatest, map, switchMap, tap, catchError, throwError } from 'rxjs';
-import { combineLatest, map, switchMap, timer } from 'rxjs';
+import { combineLatest, map, timer } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 import { Channel } from '../../../shared/channel.interface';
