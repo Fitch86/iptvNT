@@ -54,15 +54,16 @@ export class PlaylistsService {
     }
 
     deletePlaylist(playlistId: string) {  
+        console.log('dbService status:', this.dbService);  
         if (!this.dbService) {  
-            console.error('Database service not available');  
-            return throwError('Database service not initialized');  
+            console.error('NgxIndexedDBService not available');  
+            return throwError(() => new Error('Database service not initialized'));  
         }  
         return this.dbService.delete(DbStores.Playlists, playlistId).pipe(  
             tap(result => console.log('Delete result:', result)),  
             catchError(error => {  
                 console.error('Delete failed:', error);  
-                return throwError(error);  
+                return throwError(() => error);  
             })  
         );  
     }
