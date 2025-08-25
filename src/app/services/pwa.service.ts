@@ -6,6 +6,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, firstValueFrom, throwError } from 'rxjs';
+import { parse } from 'iptv-playlist-parser';
 import {
     ERROR,
     PLAYLIST_PARSE_BY_URL,
@@ -17,6 +18,7 @@ import {
     XTREAM_RESPONSE,
 } from '../../../shared/ipc-commands';
 import { Playlist } from '../../../shared/playlist.interface';
+import { createPlaylistObject, getFilenameFromUrl } from '../../../shared/playlist.utils';
 import { AppConfig } from '../../environments/environment';
 import * as PlaylistActions from '../state/actions';
 import { DataService } from './data.service';
@@ -130,10 +132,60 @@ export class PwaService extends DataService {
                 })
             )
             .subscribe((response: any) => {
-                window.postMessage({
-                    type: PLAYLIST_PARSE_RESPONSE,
-                    payload: { ...response, isTemporary: payload.isTemporary },
-                });
+                try {
+                    // 处理不同的响应格式，优先检查payload字段
+                    let playlistContent: string;
+                    
+                    if (response && typeof response.payload === 'string') {
+                        // 后端返回的标准格式：{ payload: "M3U内容" }
+                        playlistContent = response.payload;
+                    } else if (typeof response === 'string') {
+                        // 直接返回字符串
+                        playlistContent = response;
+                    } else if (response && typeof response.content === 'string') {
+                        playlistContent = response.content;
+                    } else if (response && typeof response.data === 'string') {
+                        playlistContent = response.data;
+                    } else if (response && typeof response.text === 'string') {
+                        playlistContent = response.text;
+                    } else {
+                        throw new Error('Invalid response format: no valid playlist content found');
+                    }
+                    
+                    // 验证内容是否为有效的M3U格式
+                    if (!playlistContent || typeof playlistContent !== 'string') {
+                        throw new Error('Invalid playlist content format');
+                    }
+                    
+                    // 验证内容是否看起来像M3U格式
+                    if (!playlistContent.includes('#EXTM3U') && !playlistContent.includes('#EXTINF')) {
+                        throw new Error('Content does not appear to be a valid M3U playlist');
+                    }
+                    
+                    // Parse the response content using iptv-playlist-parser
+                    const parsedPlaylist = parse(playlistContent);
+                    
+                    // Create standardized playlist object
+                    const playlist = createPlaylistObject(
+                        payload.title || getFilenameFromUrl(payload.url) || 'Untitled playlist',
+                        parsedPlaylist,
+                        payload.url,
+                        'URL'
+                    );
+                    
+                    window.postMessage({
+                        type: PLAYLIST_PARSE_RESPONSE,
+                        payload: { ...playlist, isTemporary: payload.isTemporary },
+                    });
+                } catch (parseError) {
+                    console.error('Failed to parse playlist:', parseError);
+                    console.error('Response format:', typeof response, response);
+                    window.postMessage({
+                        type: ERROR,
+                        message: `Failed to parse playlist content: ${parseError.message}`,
+                        status: 500,
+                    });
+                }
             });
     }
 

@@ -187,7 +187,7 @@ export class TauriService extends DataService {
             const parsedPlaylist = parse(responseBody);
 
             const playlist = createPlaylistObject(
-                'tests',
+                payload.title || 'Untitled playlist',
                 parsedPlaylist,
                 payload.url,
                 'URL'

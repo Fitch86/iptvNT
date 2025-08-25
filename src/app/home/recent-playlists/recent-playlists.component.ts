@@ -98,7 +98,7 @@ export class RecentPlaylistsComponent implements OnDestroy {
                     );
                 })
                 .filter((item) =>
-                    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    item.title && item.title.toLowerCase().includes(searchQuery.toLowerCase())
                 );
 
             // Apply sorting using the SortService
