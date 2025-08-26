@@ -25,7 +25,6 @@ import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { GLOBAL_FAVORITES_PLAYLIST_ID } from '../../../../shared/constants';
 import { Playlist } from '../../../../shared/playlist.interface';
 import { DataService } from '../../services/data.service';
-import { DatabaseService } from '../../services/database.service';
 import { SortService } from '../../services/sort.service';
 import * as PlaylistActions from '../../state/actions';
 import {
@@ -149,7 +148,6 @@ export class RecentPlaylistsComponent implements OnDestroy {
     listeners = [];
 
     constructor(
-        private readonly databaseService: DatabaseService,
         private readonly dialog: MatDialog,
         private readonly dialogService: DialogService,
         private readonly dataService: DataService,
@@ -238,18 +236,18 @@ export class RecentPlaylistsComponent implements OnDestroy {
      * Removes the provided playlist from the database
      * @param playlistId playlist id to remove
      */
-    async removePlaylist(playlistId: string) {
-        const deleted = await this.databaseService.deletePlaylist(playlistId);
-        if (deleted) {
-            this.store.dispatch(PlaylistActions.removePlaylist({ playlistId }));
-            this.snackBar.open(
-                this.translate.instant('HOME.PLAYLISTS.REMOVE_DIALOG.SUCCESS'),
-                null,
-                {
-                    duration: 2000,
-                }
-            );
-        }
+    removePlaylist(playlistId: string) {
+        // 通过NgRx action来处理删除，这样会自动调用正确的服务
+        this.store.dispatch(PlaylistActions.removePlaylist({ playlistId }));
+        
+        // 显示成功消息
+        this.snackBar.open(
+            this.translate.instant('HOME.PLAYLISTS.REMOVE_DIALOG.SUCCESS'),
+            null,
+            {
+                duration: 2000,
+            }
+        );
     }
 
     /**
