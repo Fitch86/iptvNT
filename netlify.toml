@@ -1,5 +1,5 @@
 [build]
-  publish = "dist/iptvnator"
+  publish = "dist/iptvnator/browser"
   command = "npm run build:prod"
 
 [build.environment]
