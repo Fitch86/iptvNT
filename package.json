@@ -5,7 +5,7 @@
   "homepage": "https://github.com/fitch86/iptvNT",
   "author": {
     "name": "fitch86",
-    "email": "fitch86@users.noreply.github.com"
+    "email": "fitch86@outlook.com"
   },
   "keywords": [
     "angular",
@@ -20,7 +20,7 @@
   "private": true,
   "scripts": {
     "build:dev": "ng build -c dev",
-    "build:prod": "ng build -c production",
+    "build:prod": "ng build -c web",
     "build:web": "ng build -c web",
     "serve": "ng serve -c dev",
     "test": "ng test",

@@ -1,6 +1,6 @@
 export const AppConfig = {
-    production: false,
+    production: true,
     environment: 'WEB',
     version: require('../../package.json').version,
-    BACKEND_URL: 'http://localhost:3001',
+    BACKEND_URL: process.env['BACKEND_URL'] || 'https://your-proxy-domain.com',
 };

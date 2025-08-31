@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Database from '@tauri-apps/plugin-sql';
+// import Database from '@tauri-apps/plugin-sql'; // Disabled for web build
 import { PlaylistMeta } from '../shared/playlist-meta.type';
 
 export interface XCategoryFromDb {
