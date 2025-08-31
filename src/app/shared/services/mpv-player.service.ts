@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
+// import { invoke } from '@tauri-apps/api/core'; // Disabled for web build
+// import { listen } from '@tauri-apps/api/event'; // Disabled for web build
 import { BehaviorSubject } from 'rxjs';
 
 export interface MpvProcess {
@@ -25,36 +25,37 @@ export class MpvPlayerService {
     }
 
     private async initializeEventListeners() {
-        // Listen for new processes
-        await listen('mpv-process-added', (event: any) => {
-            const newProcess = event.payload as MpvProcess;
-            if (newProcess) {
-                const currentProcesses = this.activeProcessesSubject.value;
-                this.activeProcessesSubject.next([
-                    ...currentProcesses,
-                    newProcess,
-                ]);
-            }
-        });
+        // Disabled for web build - Tauri event listeners not available
+        // await listen('mpv-process-added', (event: any) => {
+        //     const newProcess = event.payload as MpvProcess;
+        //     if (newProcess) {
+        //         const currentProcesses = this.activeProcessesSubject.value;
+        //         this.activeProcessesSubject.next([
+        //             ...currentProcesses,
+        //             newProcess,
+        //         ]);
+        //     }
+        // });
 
-        // Listen for removed processes
-        await listen('mpv-process-removed', (event: any) => {
-            const removedProcess = event.payload as MpvProcess;
-            if (removedProcess) {
-                const currentProcesses = this.activeProcessesSubject.value;
-                this.activeProcessesSubject.next(
-                    currentProcesses.filter((p) => p.id !== removedProcess.id)
-                );
-            }
-        });
+        // await listen('mpv-process-removed', (event: any) => {
+        //     const removedProcess = event.payload as MpvProcess;
+        //     if (removedProcess) {
+        //         const currentProcesses = this.activeProcessesSubject.value;
+        //         this.activeProcessesSubject.next(
+        //             currentProcesses.filter((p) => p.id !== removedProcess.id)
+        //         );
+        //     }
+        // });
     }
 
     private async loadActiveProcesses() {
         try {
-            const processes = await invoke<MpvProcess[]>(
-                'get_active_mpv_processes'
-            );
-            this.activeProcessesSubject.next(processes);
+            // Disabled for web build - Tauri invoke not available
+            // const processes = await invoke<MpvProcess[]>(
+            //     'get_active_mpv_processes'
+            // );
+            // this.activeProcessesSubject.next(processes);
+            this.activeProcessesSubject.next([]);
         } catch (error) {
             console.error('Failed to load active MPV processes:', error);
         }
@@ -66,23 +67,32 @@ export class MpvPlayerService {
         thumbnail?: string,
         mpvPath: string = ''
     ): Promise<number> {
-        return await invoke<number>('open_in_mpv', {
-            url,
-            path: mpvPath,
-            title,
-            thumbnail,
-        });
+        // Disabled for web build - Tauri invoke not available
+        // return await invoke<number>('open_in_mpv', {
+        //     url,
+        //     path: mpvPath,
+        //     title,
+        //     thumbnail,
+        // });
+        console.log('MPV not available in web build');
+        return 0;
     }
 
     async playStream(processId: number): Promise<void> {
-        await invoke('mpv_play', { processId });
+        // Disabled for web build - Tauri invoke not available
+        // await invoke('mpv_play', { processId });
+        console.log('MPV not available in web build');
     }
 
     async pauseStream(processId: number): Promise<void> {
-        await invoke('mpv_pause', { processId });
+        // Disabled for web build - Tauri invoke not available
+        // await invoke('mpv_pause', { processId });
+        console.log('MPV not available in web build');
     }
 
     async closeStream(processId: number): Promise<void> {
-        await invoke('close_mpv_process', { processId });
+        // Disabled for web build - Tauri invoke not available
+        // await invoke('close_mpv_process', { processId });
+        console.log('MPV not available in web build');
     }
 }

@@ -17,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
-import { invoke } from '@tauri-apps/api/core';
+// import { invoke } from '@tauri-apps/api/core'; // Disabled for web build
 import { addDays, differenceInMinutes, format, parse, subDays } from 'date-fns';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Channel } from '../../../../../shared/channel.interface';
@@ -169,24 +169,16 @@ export class MultiEpgContainerComponent
             console.log('- Limit:', this.visibleChannels);
             console.log('- Channel names count:', channelNames.length);
 
-            const response = await invoke<any>('get_epg_by_range', {
-                startTime,
-                endTime,
-                skip: this.channelsLowerRange,
-                limit: this.visibleChannels,
-                playlistChannelNames: channelNames,
-            });
+            const response = []; // Fallback for web build - empty array
 
-            if (response) {
-                console.log('Received channels:', response.length);
-                this.originalEpgData = response;
-                this.channels$.next(this.enrichProgramData());
+            console.log('Received channels:', response.length);
+            this.originalEpgData = response;
+            this.channels$.next(this.enrichProgramData());
 
-                // Update isLastPage based on the number of channels received
-                this.isLastPage = response.length < this.visibleChannels;
+            // Update isLastPage based on the number of channels received
+            this.isLastPage = response.length < this.visibleChannels;
 
-                this.cdr.detectChanges();
-            }
+            this.cdr.detectChanges();
         } catch (error) {
             console.error('Error fetching EPG data:', error);
         }
