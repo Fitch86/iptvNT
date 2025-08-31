@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 // import Database from '@tauri-apps/plugin-sql'; // Disabled for web build
 import { PlaylistMeta } from '../shared/playlist-meta.type';
 
+// Mock Database type for web build
+interface Database {
+    execute(query: string, params?: any[]): Promise<any>;
+    select<T = any>(query: string, params?: any[]): Promise<T>;
+}
+
 export interface XCategoryFromDb {
     id: number;
     name: string;
@@ -49,7 +55,11 @@ export class DatabaseService {
 
     async getConnection(): Promise<Database> {
         if (!DatabaseService.db) {
-            DatabaseService.db = await Database.load('sqlite:database.db');
+            // Mock database for web build - Tauri SQL not available
+            DatabaseService.db = {
+                execute: async () => Promise.resolve({ rowsAffected: 0 }),
+                select: async () => Promise.resolve([])
+            } as Database;
         }
         return DatabaseService.db;
     }
@@ -265,7 +275,7 @@ export class DatabaseService {
             [playlistId, dbType]
         );
 
-        const categoryMap = new Map(
+        const categoryMap = new Map<number, number>(
             categories.map((c) => [parseInt(c.xtream_id.toString()), c.id])
         );
 
