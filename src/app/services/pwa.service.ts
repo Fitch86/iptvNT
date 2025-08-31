@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Params } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { catchError, firstValueFrom, throwError } from 'rxjs';
+import { catchError, firstValueFrom, throwError, map } from 'rxjs';
 import { parse } from 'iptv-playlist-parser';
 import {
     ERROR,
@@ -23,6 +22,55 @@ import { AppConfig } from '../../environments/environment';
 import * as PlaylistActions from '../state/actions';
 import { DataService } from './data.service';
 
+/**
+ * Proxy service for handling URL transformation to use tvcors-proxy
+ */
+@Injectable({
+    providedIn: 'root',
+})
+export class ProxyService {
+    private readonly proxyBaseUrl = AppConfig.BACKEND_URL;
+
+    /**
+     * Converts a video stream URL to use the tvcors-proxy
+     */
+    getProxiedVideoUrl(originalUrl: string, userAgent?: string): string {
+        if (!originalUrl || originalUrl.includes(this.proxyBaseUrl)) {
+            return originalUrl;
+        }
+
+        const params = new URLSearchParams({ url: originalUrl });
+        if (userAgent) params.append('ua', userAgent);
+
+        // Use m3u8 proxy for HLS streams, segment proxy for others
+        const endpoint = this.isM3U8Url(originalUrl) ? 'm3u8' : 'segment';
+        return `${this.proxyBaseUrl}/api/proxy/${endpoint}?${params.toString()}`;
+    }
+
+    /**
+     * Converts a playlist URL to use the tvcors-proxy
+     */
+    getProxiedPlaylistUrl(originalUrl: string, userAgent?: string): string {
+        if (!originalUrl || originalUrl.includes(this.proxyBaseUrl)) {
+            return originalUrl;
+        }
+
+        const params = new URLSearchParams({ url: originalUrl });
+        if (userAgent) params.append('ua', userAgent);
+
+        return `${this.proxyBaseUrl}/api/proxy/m3u?${params.toString()}`;
+    }
+
+    /**
+     * Check if URL is an M3U8 stream
+     */
+    private isM3U8Url(url: string): boolean {
+        return url.toLowerCase().includes('.m3u8') || 
+               url.toLowerCase().includes('application/x-mpegurl') ||
+               url.toLowerCase().includes('application/vnd.apple.mpegurl');
+    }
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -34,7 +82,7 @@ export class PwaService extends DataService {
     private readonly translateService = inject(TranslateService);
 
     /** Proxy URL to avoid CORS issues */
-    corsProxyUrl = AppConfig.BACKEND_URL;
+    corsProxyUrl = AppConfig.BACKEND_URL || '';
 
     constructor() {
         super();
@@ -88,7 +136,7 @@ export class PwaService extends DataService {
     }
 
     refreshPlaylist(payload: Partial<Playlist & { id: string }>) {
-        this.getPlaylistFromUrl(payload.url)
+        this.getPlaylistFromUrl(payload.url, payload.userAgent)
             .pipe(
                 catchError((error) => {
                     window.postMessage({
@@ -97,10 +145,20 @@ export class PwaService extends DataService {
                     return throwError(() => error);
                 })
             )
-            .subscribe((playlist: Playlist) => {
+            .subscribe((playlistContent: string) => {
+                // Parse the M3U content and create playlist object
+                const parsedPlaylist = parse(playlistContent);
+                const playlist = createPlaylistObject(
+                    payload.title || 'Updated Playlist',
+                    parsedPlaylist,
+                    payload.url,
+                    'URL',
+                    payload.userAgent
+                );
+                
                 this.store.dispatch(
                     PlaylistActions.updatePlaylist({
-                        playlist,
+                        playlist: playlist,
                         playlistId: payload.id,
                     })
                 );
@@ -120,7 +178,7 @@ export class PwaService extends DataService {
      * @param payload playlist payload
      */
     fetchFromUrl(payload: Partial<Playlist>): void {
-        this.getPlaylistFromUrl(payload.url)
+        this.getPlaylistFromUrl(payload.url, payload.userAgent)
             .pipe(
                 catchError((error) => {
                     window.postMessage({
@@ -170,7 +228,8 @@ export class PwaService extends DataService {
                         payload.title || getFilenameFromUrl(payload.url) || 'Untitled playlist',
                         parsedPlaylist,
                         payload.url,
-                        'URL'
+                        'URL',
+                        payload.userAgent
                     );
                     
                     window.postMessage({
@@ -219,14 +278,12 @@ export class PwaService extends DataService {
             : {};
         try {
             let result: any;
+            const queryParams = new URLSearchParams({
+                url: payload.url,
+                ...payload.params,
+            });
             const response = await firstValueFrom(
-                this.http.get(`${this.corsProxyUrl}/xtream`, {
-                    params: {
-                        url: payload.url,
-                        ...payload.params,
-                    },
-                    ...headers,
-                })
+                this.http.get(this.corsProxyUrl ? `${this.corsProxyUrl}/api/proxy/xtream?${queryParams.toString()}` : `/api/proxy/xtream?${queryParams.toString()}`, headers)
             );
 
             if (!(response as any).payload) {
@@ -262,12 +319,14 @@ export class PwaService extends DataService {
         params: Record<string, string>;
         macAddress: string;
     }) {
+        const queryParams = new URLSearchParams({
+            url: payload.url,
+            ...payload.params,
+        });
         return this.http
-            .get(`${this.corsProxyUrl}/stalker`, {
-                params: {
-                    url: payload.url,
-                    ...payload.params,
-                    macAddress: payload.macAddress,
+            .get(this.corsProxyUrl ? `${this.corsProxyUrl}/api/proxy/stalker?${queryParams.toString()}` : `/api/proxy/stalker?${queryParams.toString()}`, {
+                headers: {
+                    Cookie: `mac=${payload.macAddress}`,
                 },
             })
             .subscribe((response) => {
@@ -279,10 +338,26 @@ export class PwaService extends DataService {
             });
     }
 
-    getPlaylistFromUrl(url: string) {
-        return this.http.get(`${this.corsProxyUrl}/parse`, {
-            params: { url },
-        });
+    getPlaylistFromUrl(url: string, userAgent?: string) {
+        const params = new URLSearchParams({ url });
+        if (userAgent) {
+            params.append('ua', userAgent);
+        }
+        
+        const proxyUrl = this.corsProxyUrl ? `${this.corsProxyUrl}/api/proxy/m3u?${params.toString()}` : `/api/proxy/m3u?${params.toString()}`;
+        
+        return this.http.get(proxyUrl).pipe(
+            map((response: any) => {
+                // Extract the actual M3U content from the proxy response
+                if (response && typeof response.payload === 'string') {
+                    return response.payload;
+                } else if (typeof response === 'string') {
+                    return response;
+                } else {
+                    throw new Error('Invalid response format from proxy');
+                }
+            })
+        );
     }
 
     removeAllListeners(): void {
@@ -297,7 +372,7 @@ export class PwaService extends DataService {
         return 'pwa';
     }
 
-    fetchData(url: string, queryParams: Params) {
+    fetchData() {
         // not implemented
     }
 }

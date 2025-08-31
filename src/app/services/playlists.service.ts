@@ -336,7 +336,8 @@ export class PlaylistsService {
                 title,  
                 parsedPlaylist,  
                 path,  
-                uploadType  
+                uploadType,
+                undefined // No userAgent for file uploads
             );  
         } catch (error) {  
             this.snackBar.open(  

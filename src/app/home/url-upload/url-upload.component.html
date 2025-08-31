@@ -1,4 +1,4 @@
-<form (ngSubmit)="urlAdded.emit(form.value.playlistUrl)" [formGroup]="form">
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
     <mat-form-field class="full-width">
         <input
             type="url"
@@ -7,11 +7,18 @@
             formControlName="playlistUrl"
         />
     </mat-form-field>
-    @if (!isTauri) {
-        <p>
-            {{ 'HOME.URL_UPLOAD.CORS_NOTE' | translate }}
-        </p>
-    }
+    <mat-form-field class="full-width">
+        <input
+            type="text"
+            matInput
+            placeholder="User-Agent (optional)"
+            formControlName="userAgent"
+        />
+        <mat-hint>Custom User-Agent for playlists requiring specific headers</mat-hint>
+    </mat-form-field>
+    <p>
+        {{ 'HOME.URL_UPLOAD.CORS_NOTE' | translate }}
+    </p>
     <button
         class="add-button"
         mat-flat-button

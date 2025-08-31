@@ -10,9 +10,7 @@ import {
 } from '@angular/core';
 import Hls from 'hls.js';
 import { Channel } from '../../../../../shared/channel.interface';
-import { CHANNEL_SET_USER_AGENT } from '../../../../../shared/ipc-commands';
 import { getExtensionFromUrl } from '../../../../../shared/playlist.utils';
-import { DataService } from '../../../services/data.service';
 
 /**
  * This component contains the implementation of HTML5 based video player
@@ -26,12 +24,7 @@ import { DataService } from '../../../services/data.service';
 export class HtmlVideoPlayerComponent implements OnInit, OnChanges, OnDestroy {
     /** Channel to play  */
     @Input() channel: Channel;
-    dataService: DataService; // Declare the dataService property
     @Input() volume = 1;
-
-    constructor(dataService: DataService) {
-        this.dataService = dataService; // Inject the DataService
-    }
 
     /** Video player DOM element */
     @ViewChild('videoPlayer', { static: true })
@@ -76,61 +69,30 @@ export class HtmlVideoPlayerComponent implements OnInit, OnChanges, OnDestroy {
             const url = channel.url + (channel.epgParams ?? '');
             const extension = getExtensionFromUrl(channel.url);
 
-            // Send IPC event and handle the response
-            this.dataService
-                .sendIpcEvent(CHANNEL_SET_USER_AGENT, {
-                    userAgent: channel.http?.['user-agent'] ?? '',
-                    referer: channel.http?.referrer ?? '',
-                    origin: channel.http?.origin ?? '',
-                })
-                .then(() => {
-                    if (
-                        extension !== 'mp4' &&
-                        extension !== 'mpv' &&
-                        Hls &&
-                        Hls.isSupported()
-                    ) {
-                        console.log(
-                            '... switching channel to ',
-                            channel.name,
-                            url
-                        );
-                        this.hls = new Hls();
-                        this.hls.attachMedia(this.videoPlayer.nativeElement);
-                        this.hls.loadSource(url);
-                        this.handlePlayOperation();
-                    } else {
-                        console.log('Using native video player...');
-                        this.addSourceToVideo(
-                            this.videoPlayer.nativeElement,
-                            url,
-                            'video/mp4'
-                        );
-                        this.videoPlayer.nativeElement.play();
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error setting user agent:', error);
-                    // Continue playback even if setting user agent fails
-                    if (
-                        extension !== 'mp4' &&
-                        extension !== 'mpv' &&
-                        Hls &&
-                        Hls.isSupported()
-                    ) {
-                        this.hls = new Hls();
-                        this.hls.attachMedia(this.videoPlayer.nativeElement);
-                        this.hls.loadSource(url);
-                        this.handlePlayOperation();
-                    } else {
-                        this.addSourceToVideo(
-                            this.videoPlayer.nativeElement,
-                            url,
-                            'video/mp4'
-                        );
-                        this.videoPlayer.nativeElement.play();
-                    }
-                });
+            if (
+                extension !== 'mp4' &&
+                extension !== 'mpv' &&
+                Hls &&
+                Hls.isSupported()
+            ) {
+                console.log(
+                    '... switching channel to ',
+                    channel.name,
+                    url
+                );
+                this.hls = new Hls();
+                this.hls.attachMedia(this.videoPlayer.nativeElement);
+                this.hls.loadSource(url);
+                this.handlePlayOperation();
+            } else {
+                console.log('Using native video player...');
+                this.addSourceToVideo(
+                    this.videoPlayer.nativeElement,
+                    url,
+                    'video/mp4'
+                );
+                this.videoPlayer.nativeElement.play();
+            }
         }
     }
 

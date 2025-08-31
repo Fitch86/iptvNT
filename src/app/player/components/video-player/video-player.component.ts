@@ -16,7 +16,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { StorageMap } from '@ngx-pwa/local-storage';
-import { Observable, combineLatestWith, filter, map, switchMap } from 'rxjs';
+import { Observable, filter, map, switchMap } from 'rxjs';
+import { combineLatestWith } from 'rxjs/operators';
 import { Channel } from '../../../../../shared/channel.interface';
 import {
     CHANNEL_SET_USER_AGENT,
@@ -27,6 +28,7 @@ import {
 import { Playlist } from '../../../../../shared/playlist.interface';
 import { DataService } from '../../../services/data.service';
 import { PlaylistsService } from '../../../services/playlists.service';
+import { VideoProxyService } from '../../../services/video-proxy.service';
 import { SettingsStore } from '../../../services/settings-store.service';
 import { Settings, VideoPlayer } from '../../../settings/settings.interface';
 import { STORE_KEY } from '../../../shared/enums/store-keys.enum';
@@ -77,7 +79,20 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     /** Active selected channel */
     activeChannel$ = this.store
         .select(selectActive)
-        .pipe(filter((channel) => Boolean(channel?.url)));
+        .pipe(
+            filter((channel) => Boolean(channel?.url)),
+            map((channel) => {
+                if (channel) {
+                    // Transform channel URL to use proxy
+                    const proxiedUrl = this.videoProxyService.getProxiedVideoUrl(
+                        channel.url,
+                        channel.http?.['user-agent']
+                    );
+                    return { ...channel, url: proxiedUrl };
+                }
+                return channel;
+            })
+        );
 
     /** Channels list */
     channels$!: Observable<Channel[]>;
@@ -141,6 +156,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         private ngZone: NgZone,
         private overlay: Overlay,
         private playlistsService: PlaylistsService,
+        private videoProxyService: VideoProxyService,
         private router: Router,
         private snackBar: MatSnackBar,
         private storage: StorageMap,
@@ -199,6 +215,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
                         })
                     );
                 } else if (queryParams.url) {
+                    return this.store.select(selectChannels);
+                } else {
                     return this.store.select(selectChannels);
                 }
             })

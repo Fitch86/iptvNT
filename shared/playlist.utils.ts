@@ -66,7 +66,8 @@ export const createPlaylistObject = (
     name: string,  
     playlist: ParsedPlaylist,  
     urlOrPath?: string,  
-    uploadType?: 'URL' | 'FILE' | 'TEXT'  
+    uploadType?: 'URL' | 'FILE' | 'TEXT',
+    userAgent?: string
 ): Playlist => {  
     // 过滤掉时间戳条目和其他非标准条目  
     const filteredItems = playlist.items.filter((item) => {  
@@ -101,7 +102,14 @@ export const createPlaylistObject = (
             ...playlist,  
             items: filteredItems.map((item) => ({  
                 id: uuidv4(),  
-                ...item,  
+                ...item,
+                // Set User-Agent from playlist level if not already set on channel level
+                http: {
+                    ...item.http,
+                    'user-agent': item.http?.['user-agent'] || userAgent || '',
+                    referrer: item.http?.referrer || '',
+                    origin: (item.http as any)?.origin || ''
+                }
             })),  
         },  
         importDate: new Date().toISOString(),  

@@ -16,9 +16,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { isTauri } from '@tauri-apps/api/core';
-import { save } from '@tauri-apps/plugin-dialog';
-import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { firstValueFrom } from 'rxjs';
 import { Playlist } from '../../../../../shared/playlist.interface';
 import { DatabaseService } from '../../../services/database.service';
@@ -50,7 +47,6 @@ import { XtreamStore } from '../../../xtream-tauri/xtream.store';
     ],
 })
 export class PlaylistInfoComponent {
-    isTauri = isTauri();
 
     /** Playlist object */
     playlist: Playlist & { id: string };
@@ -168,59 +164,12 @@ export class PlaylistInfoComponent {
     }
 
     async exportPlaylist() {
-        const playlistAsString = await firstValueFrom(
-            this.playlistsService.getRawPlaylistById(this.playlist._id)
+        // Export functionality not available in web version
+        console.log('Export is only available in desktop version');
+        this.snackBar.open(
+            'Export functionality is only available in desktop version',
+            null,
+            { duration: 3000 }
         );
-
-        if (this.isTauri) {
-            try {
-                const savePath = await save({
-                    filters: [
-                        {
-                            name: 'Playlist',
-                            extensions: ['m3u8'],
-                        },
-                    ],
-                    defaultPath: `${this.playlist.title || 'exported'}.m3u8`,
-                });
-
-                if (savePath) {
-                    await writeTextFile(savePath, playlistAsString);
-                    this.snackBar.open(
-                        this.translate.instant(
-                            'HOME.PLAYLISTS.INFO_DIALOG.PLAYLIST_EXPORT_SUCCESS'
-                        ),
-                        this.translate.instant('CLOSE'),
-                        { duration: 3000 }
-                    );
-                }
-            } catch (error) {
-                console.error('Failed to export playlist:', error);
-                this.snackBar.open(
-                    this.translate.instant(
-                        'HOME.PLAYLISTS.INFO_DIALOG.EXPORT_PLAYLIST_FAILED'
-                    ),
-                    this.translate.instant('CLOSE'),
-                    {
-                        duration: 3000,
-                    }
-                );
-            }
-        } else {
-            const element = document.createElement('a');
-            element.setAttribute(
-                'href',
-                'data:text/plain;charset=utf-8,' +
-                    encodeURIComponent(playlistAsString)
-            );
-            element.setAttribute(
-                'download',
-                this.playlist.title || 'exported.m3u'
-            );
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-        }
     }
 }

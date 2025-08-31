@@ -8,7 +8,6 @@ import {
 import { MatButton } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe } from '@ngx-translate/core';
-import { isTauri } from '@tauri-apps/api/core';
 
 @Component({
     selector: 'app-url-upload',
@@ -18,11 +17,10 @@ import { isTauri } from '@tauri-apps/api/core';
 export class UrlUploadComponent implements OnInit {
     private readonly fb = inject(FormBuilder);
 
-    /** Emits url string to the parent component on form submit */
-    @Output() urlAdded: EventEmitter<string> = new EventEmitter();
+    /** Emits playlist data to the parent component on form submit */
+    @Output() urlAdded: EventEmitter<{url: string, userAgent?: string}> = new EventEmitter();
 
     form: FormGroup;
-    isTauri = isTauri();
 
     ngOnInit() {
         const urlRegex = '(https?://.*?)';
@@ -31,6 +29,17 @@ export class UrlUploadComponent implements OnInit {
                 '',
                 [Validators.required, Validators.pattern(urlRegex)],
             ],
+            userAgent: [''],
         });
+    }
+
+    onSubmit() {
+        if (this.form.valid) {
+            const formValue = this.form.value;
+            this.urlAdded.emit({
+                url: formValue.playlistUrl,
+                userAgent: formValue.userAgent || undefined
+            });
+        }
     }
 }

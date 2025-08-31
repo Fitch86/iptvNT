@@ -5,8 +5,6 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { StorageMap } from '@ngx-pwa/local-storage';
 import { TranslateService } from '@ngx-translate/core';
-import { isTauri } from '@tauri-apps/api/core';
-import Database from '@tauri-apps/plugin-sql';
 import {
     combineLatestWith,
     firstValueFrom,
@@ -235,7 +233,7 @@ export class PlaylistEffects {
                     this.playlistsService.addPlaylist(action.playlist)
                 ),
                 map((playlist: Playlist) => {
-                    if (playlist.serverUrl && !isTauri()) {
+                    if (playlist.serverUrl) {
                         this.router.navigate(['/xtreams/', playlist._id]);
                     } else if (playlist.macAddress) {
                         this.router.navigate(['portals', playlist._id]);
@@ -245,23 +243,8 @@ export class PlaylistEffects {
                     return playlist;
                 }),
                 map(async (playlist) => {
-                    if (playlist.serverUrl && isTauri()) {
-                        const db = await Database.load('sqlite:database.db');
-                        const result = await db.execute(
-                            `INSERT INTO playlists (id, name, serverUrl, username, password, type)
-                        VALUES (?, ?, ?, ?, ?, ?)`,
-                            [
-                                playlist._id.toString(),
-                                playlist.title || '',
-                                playlist.serverUrl || '',
-                                playlist.username || '',
-                                playlist.password || '',
-                                'xtream',
-                            ]
-                        );
-                        console.log('inserted item', result);
-                        this.router.navigate(['/xtreams/', playlist._id]);
-                    }
+                    // Web version - playlist already handled by IndexedDB
+                    this.router.navigate(['/xtreams/', playlist._id]);
                 })
             );
         },

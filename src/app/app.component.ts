@@ -4,10 +4,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { isTauri } from '@tauri-apps/api/core';
-import { ask } from '@tauri-apps/plugin-dialog';
-import { relaunch } from '@tauri-apps/plugin-process';
-import { check } from '@tauri-apps/plugin-updater';
 import { ModalWindow } from 'ngx-whats-new/lib/modal-window.interface';
 import { firstValueFrom } from 'rxjs';
 import * as semver from 'semver';
@@ -95,19 +91,18 @@ export class AppComponent {
                 });
             }
         }
-        if (isTauri()) {
-            document.addEventListener('keydown', (event) => {
-                if (event.ctrlKey || event.metaKey) {
-                    if (event.key === 'f') {
-                        event.preventDefault();
-                        this.openGlobalSearch();
-                    } else if (event.key === 'r') {
-                        event.preventDefault();
-                        this.openGlobalRecent();
-                    }
+        // Global keyboard shortcuts for web
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey || event.metaKey) {
+                if (event.key === 'f') {
+                    event.preventDefault();
+                    this.openGlobalSearch();
+                } else if (event.key === 'r') {
+                    event.preventDefault();
+                    this.openGlobalRecent();
                 }
-            });
-        }
+            }
+        });
     }
 
     ngOnInit() {
@@ -119,62 +114,19 @@ export class AppComponent {
         this.handleWhatsNewDialog();
 
         this.triggerAutoUpdateMechanism();
-        this.checkForUpdates();
     }
 
-    async checkForUpdates() {
-        if (isTauri()) {
-            const update = await check();
-            if (update?.available) {
-                console.log(
-                    `found update ${update.version} from ${update.date} with notes ${update.body}`
-                );
-                let downloaded = 0;
-                let contentLength = 0;
-
-                const wantsUpdate = await ask(
-                    `New version ${update.version} is available. Do you want to update now?`
-                );
-
-                if (wantsUpdate) {
-                    await update.downloadAndInstall((event) => {
-                        switch (event.event) {
-                            case 'Started':
-                                contentLength = event.data.contentLength;
-                                console.log(
-                                    `started downloading ${event.data.contentLength} bytes`
-                                );
-                                break;
-                            case 'Progress':
-                                downloaded += event.data.chunkLength;
-                                console.log(
-                                    `downloaded ${downloaded} from ${contentLength}`
-                                );
-                                break;
-                            case 'Finished':
-                                console.log('download finished');
-                                break;
-                        }
-                    });
-
-                    console.log('update installed');
-                    await relaunch();
-                }
-            }
-        }
-    }
 
     async triggerAutoUpdateMechanism() {
-        if (isTauri()) {
-            const playlistForAutoUpdate = await firstValueFrom(
-                this.playlistService.getPlaylistsForAutoUpdate()
+        // Auto-update mechanism for web version
+        const playlistForAutoUpdate = await firstValueFrom(
+            this.playlistService.getPlaylistsForAutoUpdate()
+        );
+        if (playlistForAutoUpdate && playlistForAutoUpdate.length > 0)
+            this.dataService.sendIpcEvent(
+                AUTO_UPDATE_PLAYLISTS,
+                playlistForAutoUpdate
             );
-            if (playlistForAutoUpdate && playlistForAutoUpdate.length > 0)
-                this.dataService.sendIpcEvent(
-                    AUTO_UPDATE_PLAYLISTS,
-                    playlistForAutoUpdate
-                );
-        }
     }
 
     /**
@@ -205,8 +157,7 @@ export class AppComponent {
                     this.translate.use(settings.language ?? this.DEFAULT_LANG);
                     if (
                         settings.epgUrl?.length > 0 &&
-                        settings.epgUrl?.some((u) => u !== '') &&
-                        isTauri()
+                        settings.epgUrl?.some((u) => u !== '')
                     ) {
                         this.epgService.fetchEpg(settings.epgUrl);
                     }

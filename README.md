@@ -1,58 +1,28 @@
-# IPTVnator - IPTV Player Application
+# iptvNT
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/4gray/iptvnator/electron/src/assets/icons/favicon.256x256.png" alt="IPTVnator icon" title="Free IPTV player application" />
-</p>
-<p align="center">
-  <a href="https://github.com/4gray/iptvnator/releases"><img src="https://img.shields.io/github/release/4gray/iptvnator.svg?style=for-the-badge&logo=github" alt="Release"></a>
-  <a href="https://github.com/4gray/iptvnator/releases"><img src="https://img.shields.io/github/v/release/4gray/iptvnator?include_prereleases&label=pre-release&logo=github&style=for-the-badge" /></a>
- <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/4gray/iptvnator/build-and-test.yaml?style=for-the-badge&logo=github"> <a href="https://github.com/4gray/iptvnator/releases"><img src="https://img.shields.io/github/downloads/4gray/iptvnator/total?style=for-the-badge&logo=github" alt="Releases"></a> <a href="https://codecov.io/gh/4gray/iptvnator"><img alt="Codecov" src="https://img.shields.io/codecov/c/github/4gray/iptvnator?style=for-the-badge"></a> <a href="https://t.me/iptvnator"><img src="https://img.shields.io/badge/telegram-iptvnator-blue?logo=telegram&style=for-the-badge" alt="Telegram"></a> <a href="https://bsky.app/profile/iptvnator.bsky.social"><img src="https://img.shields.io/badge/bluesky-iptvnator-darkblue?logo=bluesky&style=for-the-badge" alt="Bluesky"></a>
-</p>
+![iptvNT](https://raw.githubusercontent.com/fitch86/iptvNT/main/src/assets/icons/icon.png)
 
-<a href="https://t.me/iptvnator">Telegram channel for discussions</a>
+**iptvNT** is a modern web-based IPTV player that provides seamless playback of IPTV playlists (m3u, m3u8) with advanced proxy support and custom User-Agent headers. Built as a Progressive Web App (PWA) with Angular and integrated with tvcors-proxy for CORS handling.
 
-**IPTVnator** is a video player application that provides support for IPTV playlist playback (m3u, m3u8). The application allows users to import playlists using remote URLs or by uploading files from the local file system. Additionally, it supports EPG information in XMLTV format which can be provided via URL.
-
-The application is a cross-platform, open-source project built with ~~Electron~~ Tauri and Angular.
-
-⚠️ Note: IPTVnator does not provide any playlists or other digital content. The channels and pictures in the screenshots are for demonstration purposes only.
+⚠️ **Note**: iptvNT is a generic IPTV player application that doesn't provide any playlists or digital content. Users must provide their own legitimate IPTV sources.
 
 ![IPTVnator: Channels list, player and epg list](./iptv-dark-theme.png)
 
-## Features
+## ✨ Features
 
--   M3u and M3u8 playlist support 📺
--   Xtream Code (XC) and Stalker portal (STB) support
--   External player support - MPV, VLC
--   Add playlists from the file system or remote URLs 📂
--   Automatic playlist updates on application startup
--   Channel search functionality 🔍
--   EPG support (TV Guide) with detailed information
--   TV archive/catchup/timeshift functionality
--   Group-based channel list
--   Favorite channels management
--   Global favorites aggregated from all playlists
--   HTML video player with HLS.js support or Video.js-based player
--   Internationalization with support for 16 languages:
-    * Arabic
-    * Moroccan arabic
-    * English
-    * Russian
-    * German
-    * Korean
-    * Spanish
-    * Chinese
-    * Traditional chinese
-    * French
-    * Italian
-    * Turkish
-    * Japanese
-    * Dutch
-    * Belarusian
-    * Polish  
--   Custom "User Agent" header configuration for playlists
--   Light and Dark themes
--   Docker version available for self-hosting
+- 📺 **M3u and M3u8 playlists support** with advanced parsing
+- 🔗 **Proxy integration** with tvcors-proxy for seamless streaming
+- 🔧 **Custom User-Agent headers** per playlist and channel
+- 🌐 **Progressive Web App (PWA)** - works in any modern browser
+- 📁 **Multiple import methods** - file upload or remote URL
+- 🔄 **Auto-refresh playlists** with configurable intervals
+- 🔍 **Advanced search** across channels and groups
+- 📺 **EPG support** (TV Guide) with XMLTV format
+- ⭐ **Channel favorites** and custom grouping
+- 🎨 **Modern UI** with light and dark themes
+- 🌍 **Multi-language support** (English, Chinese, and more)
+- ⚡ **High performance** video playback with VideoJS and HLS.js
+- 🔒 **CORS handling** for restricted streaming sources
 
 ## Screenshots:
 
@@ -66,80 +36,106 @@ The application is a cross-platform, open-source project built with ~~Electron~~
 |                         Playlist settings                          |
 |         ![Playlist settings](./iptv-playlist-settings.png)         |                                                               |
 
-_Note: First version of the application which was developed as a PWA is available in an extra git branch._
+## 🚀 Quick Start
 
-## Download
+### Development
+```bash
+# Install dependencies
+npm install
 
-Download the latest version of the application for macOS, Windows, and Linux from the [release page](https://github.com/4gray/iptvnator/releases).
+# Start development server
+npm run serve
 
-Alternatively, you can install the application using one of the following package managers:
-
-### Homebrew
-
-```shell
-$ brew install iptvnator
+# Start tvcors-proxy (required for streaming)
+# In a separate terminal, run your tvcors-proxy server on port 3001
 ```
 
-### Snap
+### Production Deployment
 
-```shell
-$ sudo snap install iptvnator
+#### Option 1: Static Hosting (Recommended)
+```bash
+# Build for production
+npm run build:prod
+
+# Deploy the dist/ folder to any static hosting service:
+# - Netlify, Vercel, GitHub Pages
+# - Nginx, Apache, or any web server
+# - CDN services like Cloudflare Pages
 ```
 
-### Arch
+#### Option 2: Docker Deployment
+```bash
+# Build Docker image
+docker build -t iptvnt .
 
-Also available as an Arch PKG, [iptvnator-bin](https://aur.archlinux.org/packages/iptvnator-bin/), in the AUR (using your favourite AUR-helper, .e.g. `yay`)
-
-```shell
-$ yay -S iptvnator-bin
+# Run container
+docker run -p 80:80 iptvnt
 ```
 
-### Gentoo
+#### Backend Requirements
+iptvNT requires a tvcors-proxy backend for streaming functionality:
+- Clone and deploy [tvcors-proxy](https://github.com/your-proxy-repo)
+- Configure `BACKEND_URL` in environment settings
+- Ensure CORS is properly configured
 
-You can install IPTVnator from the [gentoo-zh overlay](https://github.com/microcai/gentoo-zh)
+## 📖 Usage Guide
 
-```shell
-sudo eselect repository enable gentoo-zh
-sudo emerge --sync gentoo-zh
-sudo emerge iptvnator-bin
+### Adding Playlists
+1. **Via URL**: Enter playlist URL and optional User-Agent header
+2. **Via File**: Upload M3U/M3U8 files directly from your device
+
+### Custom User-Agent
+Many IPTV providers require specific User-Agent headers:
+```
+okHttp/Mod-1.2.0
+VLC/3.0.0 LibVLC/3.0.0
+Mozilla/5.0 (compatible; IPTV)
 ```
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/iptvnator)
+### Proxy Configuration
+The app automatically routes streaming requests through tvcors-proxy:
+- Development: `http://localhost:3001/api/proxy`
+- Production: Configure `BACKEND_URL` environment variable
 
-<a href="https://github.com/sponsors/4gray" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-green.png" alt="Buy Me A Coffee" width="185"></a>
+## 🛠️ Technical Stack
 
-## How to Build and Develop
+- **Frontend**: Angular 19, TypeScript, Angular Material
+- **Video Player**: VideoJS with HLS.js support
+- **State Management**: NgRx for application state
+- **Storage**: IndexedDB for offline playlist storage
+- **PWA**: Service Worker for offline functionality
+- **Proxy**: tvcors-proxy for CORS and User-Agent handling
 
-Requirements:
+## 🌐 Browser Support
 
--   Node.js with npm
--   Rust (required for tauri)
+- Chrome/Chromium 91+
+- Firefox 90+
+- Safari 14+
+- Edge 91+
 
-1. Clone this repository and install project dependencies:
+## 📱 Mobile Support
 
-    ```
-    $ npm install
-    ```
+iptvNT works on mobile devices as a PWA:
+- Add to home screen for app-like experience
+- Responsive design for all screen sizes
+- Touch-friendly controls
 
-2. Start the application:
-    ```
-    $ npm run tauri dev
-    ```
+## 🤝 Contributing
 
-This will open the Tauri version in a separate window, while the PWA version will be available at http://localhost:4200.
+Contributions are welcome! Please feel free to submit issues and pull requests.
 
-To run only the Angular app without Tauri, use:
-
+### Development Setup
+```bash
+git clone https://github.com/fitch86/iptvNT.git
+cd iptvNT
+npm install
+npm run serve
 ```
-$ npm run serve
-```
 
-## Disclaimer
+## 📄 License
 
-**IPTVnator doesn't provide any playlists or other digital content.**
+[MIT](LICENSE.md)
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+## 🙏 Acknowledgments
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors)
-
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+Based on the original IPTVnator project by 4gray, enhanced with modern web technologies and proxy integration.

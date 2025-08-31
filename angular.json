@@ -93,7 +93,8 @@
                     },
                     "configurations": {
                         "dev": {
-                            "buildTarget": "iptvnator:build:dev"
+                            "buildTarget": "iptvnator:build:dev",
+                            "proxyConfig": "proxy.conf.json"
                         },
                         "web": {
                             "buildTarget": "iptvnator:build:web"

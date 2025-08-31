@@ -7,16 +7,13 @@ if (AppConfig.production) {
     enableProdMode();
 }
 
-// Detect if running in Tauri
-const isTauri = window && (window as any).__TAURI__;
-
 platformBrowserDynamic()
     .bootstrapModule(AppModule, {
         preserveWhitespaces: false,
     })
     .then(() => {
-        // Only register service worker for web builds
-        if (!isTauri && 'serviceWorker' in navigator) {
+        // Register service worker for web builds
+        if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/ngsw-worker.js');
         }
     })

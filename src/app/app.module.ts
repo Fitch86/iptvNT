@@ -13,7 +13,6 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { isTauri } from '@tauri-apps/api/core';
 import { NgxIndexedDBModule, NgxIndexedDBService } from 'ngx-indexed-db';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { NgxWhatsNewModule } from 'ngx-whats-new';
@@ -25,7 +24,6 @@ import { AppComponent } from './app.component';
 import { dbConfig } from './indexed-db.config';
 import { DataService } from './services/data.service';
 import { PwaService } from './services/pwa.service';
-import { TauriService } from './services/tauri.service';
 import { PlaylistEffects } from './state/effects';
 import { playlistReducer } from './state/reducers';
 
@@ -35,13 +33,10 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 /**
- * Conditionally imports the necessary service based on the current environment
+ * Factory function for PWA service
  */
-export function DataFactory() {  
-    if (isTauri()) {  
-        return new TauriService();  
-    }  
-    return new PwaService();  
+export function DataFactory() {
+    return new PwaService();
 }
 
 @NgModule({
@@ -70,7 +65,7 @@ export function DataFactory() {
             },
         }),
         ServiceWorkerModule.register('ngsw-worker.js', {
-            enabled: AppConfig.production && !isTauri(),
+            enabled: AppConfig.production,
             registrationStrategy: 'registerWhenStable:30000',
         }),
         StoreModule.forRoot({

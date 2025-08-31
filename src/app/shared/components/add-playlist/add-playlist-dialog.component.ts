@@ -77,12 +77,13 @@ export class AddPlaylistDialogComponent {
 
     /**
      * Sends url of the playlist to the renderer process
-     * @param playlistUrl url of the added playlist
+     * @param playlistData playlist data including url and optional userAgent
      */
-    sendPlaylistsUrl(playlistUrl: string): void {
+    sendPlaylistsUrl(playlistData: {url: string, userAgent?: string}): void {
         this.dataService.sendIpcEvent(PLAYLIST_PARSE_BY_URL, {
-            title: getFilenameFromUrl(playlistUrl),
-            url: playlistUrl,
+            title: getFilenameFromUrl(playlistData.url),
+            url: playlistData.url,
+            userAgent: playlistData.userAgent,
         });
         this.closeDialog();
     }
