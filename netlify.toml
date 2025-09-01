@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build:prod && sed -i 's/PLACEHOLDER_BACKEND_URL/'\"$BACKEND_URL\"'/g' dist/browser/assets/config.json"
+  command = "npm run build:prod && sed -i 's|PLACEHOLDER_BACKEND_URL|'$BACKEND_URL'|g' dist/browser/assets/config.json"
   publish = "dist/browser"
 
 [build.environment]
