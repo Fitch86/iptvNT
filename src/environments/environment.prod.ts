@@ -1,6 +1,6 @@
 export const AppConfig = {
     production: true,
     environment: 'PROD',
-    version: require('../../package.json').version,
-    BACKEND_URL: (globalThis as any).process?.env?.['BACKEND_URL'] || 'http://localhost:3001',
+    version: '1.0.0', // Hardcoded to avoid require() in browser
+    BACKEND_URL: '', // Will be loaded at runtime from config.json
 };
