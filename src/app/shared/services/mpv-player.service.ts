@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
 import { BehaviorSubject } from 'rxjs';
 
 export interface MpvProcess {
@@ -20,44 +18,18 @@ export class MpvPlayerService {
     public activeProcesses$ = this.activeProcessesSubject.asObservable();
 
     constructor() {
-        this.initializeEventListeners();
-        this.loadActiveProcesses();
+        // Note: Tauri functionality is not implemented in this build
+        // MPV player service is disabled
     }
 
     private async initializeEventListeners() {
-        // Listen for new processes
-        await listen('mpv-process-added', (event: any) => {
-            const newProcess = event.payload as MpvProcess;
-            if (newProcess) {
-                const currentProcesses = this.activeProcessesSubject.value;
-                this.activeProcessesSubject.next([
-                    ...currentProcesses,
-                    newProcess,
-                ]);
-            }
-        });
-
-        // Listen for removed processes
-        await listen('mpv-process-removed', (event: any) => {
-            const removedProcess = event.payload as MpvProcess;
-            if (removedProcess) {
-                const currentProcesses = this.activeProcessesSubject.value;
-                this.activeProcessesSubject.next(
-                    currentProcesses.filter((p) => p.id !== removedProcess.id)
-                );
-            }
-        });
+        // Tauri functionality not available in this build
+        console.warn('MPV player service requires Tauri, which is not available in this build');
     }
 
     private async loadActiveProcesses() {
-        try {
-            const processes = await invoke<MpvProcess[]>(
-                'get_active_mpv_processes'
-            );
-            this.activeProcessesSubject.next(processes);
-        } catch (error) {
-            console.error('Failed to load active MPV processes:', error);
-        }
+        // Tauri functionality not available in this build
+        console.warn('MPV player service requires Tauri, which is not available in this build');
     }
 
     async openStream(
@@ -66,23 +38,19 @@ export class MpvPlayerService {
         thumbnail?: string,
         mpvPath: string = ''
     ): Promise<number> {
-        return await invoke<number>('open_in_mpv', {
-            url,
-            path: mpvPath,
-            title,
-            thumbnail,
-        });
+        console.warn('MPV player service requires Tauri, which is not available in this build');
+        return -1;
     }
 
     async playStream(processId: number): Promise<void> {
-        await invoke('mpv_play', { processId });
+        console.warn('MPV player service requires Tauri, which is not available in this build');
     }
 
     async pauseStream(processId: number): Promise<void> {
-        await invoke('mpv_pause', { processId });
+        console.warn('MPV player service requires Tauri, which is not available in this build');
     }
 
     async closeStream(processId: number): Promise<void> {
-        await invoke('close_mpv_process', { processId });
+        console.warn('MPV player service requires Tauri, which is not available in this build');
     }
 }

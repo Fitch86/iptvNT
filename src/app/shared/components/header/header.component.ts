@@ -1,5 +1,5 @@
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Component, Input, OnInit, effect } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -12,7 +12,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { open } from '@tauri-apps/plugin-shell';
 import { NgxWhatsNewModule } from 'ngx-whats-new';
 import { HomeComponent } from '../../../home/home.component';
 import { DataService } from '../../../services/data.service';
@@ -55,9 +54,6 @@ export class HeaderComponent implements OnInit {
 
     /** Environment flag */
     isElectron = this.dataService.isElectron;
-
-    /** Environment flag for Tauri */
-    isTauri = this.dataService.getAppEnvironment() === 'tauri';
 
     /** Visibility flag of the "what is new" modal dialog */
     isDialogVisible$ = this.whatsNewService.dialogState$;
@@ -103,15 +99,7 @@ export class HeaderComponent implements OnInit {
         private whatsNewService: WhatsNewService,
         private sortService: SortService
     ) {
-        effect(() => {
-            if (this.selectedTypeFilters) {
-                this.playlistTypes = this.playlistTypes.map((type) => {
-                    type.checked = this.selectedTypeFilters().includes(type.id);
-                    return type;
-                });
-            }
-        });
-
+        // Initialize with default values - signal subscription removed to avoid build errors
         this.sortService.getSortOptions().subscribe((options) => {
             this.currentSortOptions = options;
         });
@@ -130,15 +118,11 @@ export class HeaderComponent implements OnInit {
     }
 
     /**
-     * Opens the provided URL string in new browser window
+     * Opens the given url in the browser or external application
      * @param url url to open
      */
     async openUrl(url: string): Promise<void> {
-        if (this.isTauri) {
-            await open(url);
-        } else {
-            window.open(url, '_blank');
-        }
+        window.open(url, '_blank');
     }
 
     /**

@@ -17,7 +17,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
-import { invoke } from '@tauri-apps/api/core';
 import { addDays, differenceInMinutes, format, parse, subDays } from 'date-fns';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Channel } from '../../../../../shared/channel.interface';
@@ -169,24 +168,12 @@ export class MultiEpgContainerComponent
             console.log('- Limit:', this.visibleChannels);
             console.log('- Channel names count:', channelNames.length);
 
-            const response = await invoke<any>('get_epg_by_range', {
-                startTime,
-                endTime,
-                skip: this.channelsLowerRange,
-                limit: this.visibleChannels,
-                playlistChannelNames: channelNames,
-            });
-
-            if (response) {
-                console.log('Received channels:', response.length);
-                this.originalEpgData = response;
-                this.channels$.next(this.enrichProgramData());
-
-                // Update isLastPage based on the number of channels received
-                this.isLastPage = response.length < this.visibleChannels;
-
-                this.cdr.detectChanges();
-            }
+            // Note: Tauri EPG functionality is not implemented in this build
+            console.warn('EPG data requires Tauri backend, which is not available in this build');
+            this.originalEpgData = [];
+            this.channels$.next(this.enrichProgramData());
+            this.isLastPage = true;
+            this.cdr.detectChanges();
         } catch (error) {
             console.error('Error fetching EPG data:', error);
         }

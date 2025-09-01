@@ -13,65 +13,6 @@
 
 <div class="settings-container" data-test-id="settings-container">
     <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" novalidate>
-        <ng-container formArrayName="epgUrl" *ngIf="isTauri">
-            <div class="row">
-                <div class="column">
-                    {{ 'SETTINGS.EPG_URL_LABEL' | translate }}
-                    <p>Add single or multiple URLs as EPG sources</p>
-                </div>
-                <div class="column">
-                    <div
-                        *ngFor="let _ of epgUrl.controls; index as i"
-                        style="display: flex"
-                    >
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{
-                                'SETTINGS.EPG_URL_PLACEHOLDER' | translate
-                            }}</mat-label>
-                            <input
-                                matInput
-                                type="url"
-                                [formControlName]="i"
-                                #epgField
-                            />
-                            <mat-error>{{
-                                'SETTINGS.EPG_URL_ERROR' | translate
-                            }}</mat-error>
-                        </mat-form-field>
-                        <button
-                            matLine
-                            mat-icon-button
-                            color="accent"
-                            [matTooltip]="'SETTINGS.REFRESH_EPG' | translate"
-                            type="button"
-                            [disabled]="epgField.value === ''"
-                            (click)="refreshEpg(epgUrl.value[i])"
-                        >
-                            <mat-icon>refresh</mat-icon>
-                        </button>
-                        <button
-                            mat-icon-button
-                            matLine
-                            color="accent"
-                            [matTooltip]="'SETTINGS.REFRESH_EPG' | translate"
-                            type="button"
-                            (click)="removeEpgSource(i)"
-                        >
-                            <mat-icon>remove</mat-icon>
-                        </button>
-                    </div>
-                    <button
-                        mat-button
-                        color="accent"
-                        type="button"
-                        (click)="addEpgSource()"
-                    >
-                        {{ 'SETTINGS.ADD_EPG_SOURCE' | translate }}
-                    </button>
-                </div>
-            </div>
-        <mat-divider />
-        </ng-container>
         <div class="row">
             <div class="column">
                 {{ 'SETTINGS.VIDEO_PLAYER_LABEL' | translate }}
