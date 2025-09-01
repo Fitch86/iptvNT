@@ -123,6 +123,11 @@ export class PlaylistInfoComponent {
                 PlaylistActions.updatePlaylistMeta({ playlist })
             );
 
+            // If userAgent was updated, refresh the playlist to apply it to channels
+            if (playlist.userAgent !== this.playlist.userAgent && playlist.url) {
+                this.refreshPlaylistWithUserAgent(playlist);
+            }
+
             this.snackBar.open(
                 this.translate.instant(
                     'HOME.PLAYLISTS.PLAYLIST_UPDATE_SUCCESS'
@@ -161,6 +166,16 @@ export class PlaylistInfoComponent {
             password: playlist.password,
             serverUrl: playlist.serverUrl,
         });
+    }
+
+    private refreshPlaylistWithUserAgent(playlist: PlaylistMeta): void {
+        // Trigger playlist refresh with updated User-Agent
+        this.store.dispatch(
+            PlaylistActions.refreshPlaylist({ 
+                playlistId: playlist._id,
+                userAgent: playlist.userAgent 
+            })
+        );
     }
 
     async exportPlaylist() {

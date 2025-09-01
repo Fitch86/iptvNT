@@ -7,6 +7,7 @@ import { StorageMap } from '@ngx-pwa/local-storage';
 import { TranslateService } from '@ngx-translate/core';
 import {
     combineLatestWith,
+    EMPTY,
     firstValueFrom,
     map,
     switchMap,
@@ -18,6 +19,7 @@ import {
     EPG_GET_PROGRAM,
     OPEN_MPV_PLAYER,
     OPEN_VLC_PLAYER,
+    PLAYLIST_UPDATE,
 } from '../../../shared/ipc-commands';
 import { Playlist } from '../../../shared/playlist.interface';
 import { DataService } from '../services/data.service';
@@ -260,6 +262,30 @@ export class PlaylistEffects {
 
                     return this.playlistsService.updatePlaylistMeta(
                         action.playlist
+                    );
+                })
+            );
+        },
+        { dispatch: false }
+    );
+
+    refreshPlaylist$ = createEffect(
+        () => {
+            return this.actions$.pipe(
+                ofType(PlaylistActions.refreshPlaylist),
+                switchMap((action) => {
+                    return this.playlistsService.getPlaylistById(action.playlistId).pipe(
+                        switchMap((playlist) => {
+                            if (playlist?.url) {
+                                this.dataService.sendIpcEvent(PLAYLIST_UPDATE, {
+                                    id: action.playlistId,
+                                    title: playlist.title,
+                                    url: playlist.url,
+                                    userAgent: action.userAgent || playlist.userAgent,
+                                });
+                            }
+                            return EMPTY;
+                        })
                     );
                 })
             );

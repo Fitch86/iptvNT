@@ -258,6 +258,7 @@ export class RecentPlaylistsComponent implements OnDestroy {
         this.dataService.sendIpcEvent(PLAYLIST_UPDATE, {
             id: item._id,
             title: item.title,
+            userAgent: item.userAgent,
             ...(item.url ? { url: item.url } : { filePath: item.filePath }),
         });
     }

@@ -36,6 +36,11 @@ export const updatePlaylistMeta = createAction(
     props<{ playlist: PlaylistMeta }>()
 );
 
+export const refreshPlaylist = createAction(
+    `${PLAYLISTS_STORE_KEY} refresh playlist`,
+    props<{ playlistId: string; userAgent?: string }>()
+);
+
 export const updatePlaylist = createAction(
     `${PLAYLISTS_STORE_KEY} update playlist`,
     props<{ playlist: Playlist; playlistId: string }>()
