@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
-import { AppConfig } from '../../environments/environment';
+import { Injectable, inject } from '@angular/core';
+import { ConfigService } from './config.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class VideoProxyService {
-    private readonly proxyBaseUrl = AppConfig.BACKEND_URL || '/api';
+    private readonly configService = inject(ConfigService);
+    private readonly proxyBaseUrl = this.configService.settings.BACKEND_URL || '/api';
 
     /**
      * Converts a video stream URL to use the tvcors-proxy for streaming

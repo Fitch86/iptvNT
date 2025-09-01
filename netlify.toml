@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build:prod && sed -i 's/PLACEHOLDER_BACKEND_URL/'\"$BACKEND_URL\"'/g' dist/browser/assets/config.json"
+  publish = "dist/browser"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[headers]]
+  for = "/assets/config.json"
+  [headers.values]
+    Cache-Control = "no-cache"

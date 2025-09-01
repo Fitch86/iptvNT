@@ -18,7 +18,7 @@ import {
 } from '../../../shared/ipc-commands';
 import { Playlist } from '../../../shared/playlist.interface';
 import { createPlaylistObject, getFilenameFromUrl } from '../../../shared/playlist.utils';
-import { AppConfig } from '../../environments/environment';
+import { ConfigService } from './config.service';
 import * as PlaylistActions from '../state/actions';
 import { DataService } from './data.service';
 
@@ -29,13 +29,13 @@ import { DataService } from './data.service';
     providedIn: 'root',
 })
 export class ProxyService {
-    private readonly proxyBaseUrl = AppConfig.BACKEND_URL;
+    private readonly configService = inject(ConfigService);
 
     /**
      * Converts a video stream URL to use the tvcors-proxy
      */
     getProxiedVideoUrl(originalUrl: string, userAgent?: string): string {
-        if (!originalUrl || originalUrl.includes(this.proxyBaseUrl)) {
+        if (!originalUrl || originalUrl.includes(this.configService.backendUrl)) {
             return originalUrl;
         }
 
@@ -44,21 +44,21 @@ export class ProxyService {
 
         // Use m3u8 proxy for HLS streams, segment proxy for others
         const endpoint = this.isM3U8Url(originalUrl) ? 'm3u8' : 'segment';
-        return `${this.proxyBaseUrl}/api/proxy/${endpoint}?${params.toString()}`;
+        return `${this.configService.backendUrl}/api/proxy/${endpoint}?${params.toString()}`;
     }
 
     /**
      * Converts a playlist URL to use the tvcors-proxy
      */
     getProxiedPlaylistUrl(originalUrl: string, userAgent?: string): string {
-        if (!originalUrl || originalUrl.includes(this.proxyBaseUrl)) {
+        if (!originalUrl || originalUrl.includes(this.configService.backendUrl)) {
             return originalUrl;
         }
 
         const params = new URLSearchParams({ url: originalUrl });
         if (userAgent) params.append('ua', userAgent);
 
-        return `${this.proxyBaseUrl}/api/proxy/m3u?${params.toString()}`;
+        return `${this.configService.backendUrl}/api/proxy/m3u?${params.toString()}`;
     }
 
     /**
@@ -80,9 +80,12 @@ export class PwaService extends DataService {
     private readonly store = inject(Store);
     private readonly swUpdate = inject(SwUpdate);
     private readonly translateService = inject(TranslateService);
+    private readonly configService = inject(ConfigService);
 
     /** Proxy URL to avoid CORS issues */
-    corsProxyUrl = AppConfig.BACKEND_URL || '';
+    get corsProxyUrl(): string {
+        return this.configService.backendUrl || '';
+    }
 
     constructor() {
         super();
@@ -105,7 +108,7 @@ export class PwaService extends DataService {
     }
 
     getAppVersion(): string {
-        return AppConfig.version;
+        return this.configService.version;
     }
 
     /**

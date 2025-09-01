@@ -1,20 +1,19 @@
 import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppModule } from './app/app.module';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
+import { ConfigService } from './app/services/config.service';
 import { AppConfig } from './environments/environment';
 
 if (AppConfig.production) {
     enableProdMode();
 }
 
-platformBrowserDynamic()
-    .bootstrapModule(AppModule, {
-        preserveWhitespaces: false,
-    })
-    .then(() => {
-        // Register service worker for web builds
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/ngsw-worker.js');
-        }
-    })
-    .catch((err) => console.error(err));
+async function bootstrap() {
+  const app = await bootstrapApplication(AppComponent, appConfig);
+  const configService = app.injector.get(ConfigService);
+  await configService.loadConfig();
+  return app;
+}
+
+bootstrap().catch(err => console.error(err));
