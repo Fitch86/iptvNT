@@ -18,6 +18,7 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { NgxWhatsNewModule } from 'ngx-whats-new';
 import 'reflect-metadata';
 import { AppConfig } from '../environments/environment';
+import { ConfigService } from './services/config.service';
 import '../polyfills';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -46,17 +47,12 @@ export function DataFactory() {
         AppRoutingModule,
         BrowserAnimationsModule,
         BrowserModule,
-        // Remove this conditional import  
-        //AppConfig.environment === 'WEB'  
-        //    ? NgxIndexedDBModule.forRoot(dbConfig)  
-        //    : [],  
-        // Keep only this one  
-        NgxWhatsNewModule,
         NgxIndexedDBModule.forRoot(dbConfig),
         NgxSkeletonLoaderModule.forRoot({
             animation: 'pulse',
             loadingText: 'This item is actually loading...',
         }),
+        NgxWhatsNewModule,
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
@@ -86,6 +82,14 @@ export function DataFactory() {
             deps: [NgxIndexedDBService, HttpClient],
         },
         provideHttpClient(withInterceptorsFromDi()),
+        ConfigService,
     ],
 })
-export class AppModule {}
+export class AppModule {
+    constructor(private configService: ConfigService) {
+        // Load configuration on app startup
+        this.configService.loadConfig().catch(err => 
+            console.warn('Failed to load runtime config:', err)
+        );
+    }
+}

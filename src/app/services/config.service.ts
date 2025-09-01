@@ -22,4 +22,8 @@ export class ConfigService {
   get backendUrl(): string {
     return this.config.BACKEND_URL || 'http://localhost:3001';
   }
+
+  get version(): string {
+    return require('../../../package.json').version;
+  }
 }
