@@ -16,7 +16,7 @@ export class WhatsNewService {
                 imageHeight: 470,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/060/dark-theme.png',
-                title: 'New in v0.6.0 - Dark theme 🎉',
+                title: 'New in v0.6.0 - Dark theme ',
                 text: 'Finally, the dark theme is now available. Check the settings page of the application to change the theme.',
                 button: {
                     text: 'OKAY',
@@ -28,7 +28,7 @@ export class WhatsNewService {
                 imageHeight: 470,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/060/channel-logos.png',
-                title: 'Channel logos 📺',
+                title: 'Channel logos ',
                 text: 'The channel list was extended with the visualization of logotypes (only visible if they are defined in the playlist)',
                 button: {
                     text: 'OKAY',
@@ -40,7 +40,7 @@ export class WhatsNewService {
                 imageHeight: 470,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/060/custom-user-agent.png',
-                title: 'Custom user agent 🕵️‍♂️',
+                title: 'Custom user agent ',
                 text: 'Some IPTV providers need a specific user-agent in order to play their playlist. Support of custom user agent is available now.',
                 button: {
                     text: 'GOT IT',
@@ -54,7 +54,7 @@ export class WhatsNewService {
                 imageHeight: 500,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/070/refresh-playlist.png',
-                title: 'New in v0.7.0 - Refresh playlists 🎉',
+                title: 'New in v0.7.0 - Refresh playlists ',
                 text: "Now you don't have to delete and re-add a playlist if it changes, you can simply update it directly from the user interface.",
                 button: {
                     text: 'Nice!',
@@ -66,7 +66,7 @@ export class WhatsNewService {
                 imageHeight: 500,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/070/auto-refresh.png',
-                title: 'Auto-refresh playlists 🎉',
+                title: 'Auto-refresh playlists ',
                 text: 'In addition, an auto-refresh playlist function is available so that the playlists will be updated automatically every time the app is started.',
                 button: {
                     text: 'Okay',
@@ -80,7 +80,7 @@ export class WhatsNewService {
                 imageHeight: 310,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/080/translations.png',
-                title: 'New in v0.8.0 - New translations 🎉',
+                title: 'New in v0.8.0 - New translations ',
                 html: 'The new release includes the localization of the application into two new languages: Korean and Spanish. Many thanks to the contributors for the translation! (<a target="_blank" href="https://github.com/chaeya">@chaeya</a>, <a target="_blank" href="https://github.com/sguinetti">@sguinetti</a>, <a target="_blank" href="https://github.com/anthonyaxenov">anthonyaxenov</a>)',
                 button: {
                     text: 'Nice!',
@@ -90,7 +90,7 @@ export class WhatsNewService {
             },
             {
                 title: 'User-Agent Support on Channel Level',
-                html: 'Now user-agent support can be specified not only on the playlist level but also on the level of individual channels. For this purpose, support for Kodi <a target="_blank" href="https://github.com/4gray/iptvnator/issues/57">playlist format</a> was added to the application.',
+                html: 'Now user-agent support can be specified not only on the playlist level but also on the level of individual channels. For this purpose, support for Kodi <a target="_blank" href="https://github.com/Fitch86/iptvNT/issues/57">playlist format</a> was added to the application.',
                 button: {
                     text: 'Next!',
                     textColor: '#ccc',
@@ -99,7 +99,7 @@ export class WhatsNewService {
             },
             {
                 title: 'Information about current EPG program',
-                html: 'Similarly to digital receivers, after you switch channels at the bottom of the screen you will see a pop-up window with information about the current program <a target="_blank" href="https://github.com/4gray/iptvnator/issues/51">#51</a>',
+                html: 'Similarly to digital receivers, after you switch channels at the bottom of the screen you will see a pop-up window with information about the current program <a target="_blank" href="https://github.com/Fitch86/iptvNT/issues/51">#51</a>',
                 imageHeight: 250,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/080/channel-info.png',
@@ -111,7 +111,7 @@ export class WhatsNewService {
             },
             {
                 title: 'This and that',
-                html: 'In addition to the already mentioned new features, some bugs have been fixed and the internal dependencies of the application have been updated. Thanks for all the <a href="https://github.com/4gray/iptvnator/issues" target="_blank">ideas</a>, contributions and <a target="_blank" href="https://github.com/sponsors/4gray">first donations.</a>',
+                html: 'In addition to the already mentioned new features, some bugs have been fixed and the internal dependencies of the application have been updated. Thanks for all the <a href="https://github.com/Fitch86/iptvNT/issues" target="_blank">ideas</a>, contributions and <a target="_blank" href="https://github.com/sponsors/Fitch86">first donations.</a>',
                 button: {
                     text: 'YAY!',
                     textColor: '#ccc',
@@ -124,8 +124,8 @@ export class WhatsNewService {
                 imageHeight: 310,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/090/reorder-playlists.gif',
-                title: '🎉 v0.9.0 - rearrange playlists',
-                html: 'The new version of the app has an option to <a href="https://github.com/4gray/iptvnator/issues/77" target="_blank">sort the playlists</a> using drag&drop.',
+                title: ' v0.9.0 - rearrange playlists',
+                html: 'The new version of the app has an option to <a href="https://github.com/Fitch86/iptvNT/issues/77" target="_blank">sort the playlists</a> using drag&drop.',
                 button: {
                     text: 'YAY!',
                     textColor: '#ccc',
@@ -160,7 +160,7 @@ export class WhatsNewService {
                 title: 'This & That',
                 html: `
                     * improved english translation (thanks to <a target="_blank" href="https://github.com/mbuett">@mbuett</a>)<br />
-                    * bugfixes and visual improvements, see <a href="https://github.com/4gray/iptvnator/blob/master/CHANGELOG.md">changelog</a> for more details
+                    * bugfixes and visual improvements, see <a href="https://github.com/Fitch86/iptvNT/blob/master/CHANGELOG.md">changelog</a> for more details
                 `,
                 button: {
                     text: 'YAY!',
@@ -171,7 +171,7 @@ export class WhatsNewService {
         ],
         '0.10.0': [
             {
-                title: "🎉 v0.10.0 - What's new",
+                title: " v0.10.0 - What's new",
                 html: `
                     <h3>Playlist navigation from the sidebar</h3>
                     Switching between playlists is now possible directly from the sidebar and without interrupting channel viewing.
@@ -180,7 +180,7 @@ export class WhatsNewService {
                     Additional playlist has been added, which is generated on the fly and contains favorite channels from all existing playlists.
 
                     <h3>PWA</h3>
-                    IPTVnator is now available as a <a href="https://iptvnator.vercel.app/" target="_blank">web-application</a>, which means that you can use it directly from the browser. This means that application can be run on smartphones, tablets, set-top boxes or smart tv browsers.
+                    iptvNT is now available as a <a href="https://iptvnator.vercel.app/" target="_blank">web-application</a>, which means that you can use it directly from the browser. This means that application can be run on smartphones, tablets, set-top boxes or smart tv browsers.
 
                     <h3>French localization</h3>
                     The app has been translated into another language and is now available in French. Many thanks to <a href="https://github.com/m-p-3" target="_blank">@m-p-3</a> for the translation!
@@ -209,7 +209,7 @@ export class WhatsNewService {
                 imageHeight: 400,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/0110/multi-epg-view.png',
-                title: '🎉 Multi-EPG view',
+                title: ' Multi-EPG view',
                 html: 'The first version of multi-EPG view was developed, which is familiar to many users from set-top boxes. At this stage the view works in purely informative mode.',
                 button: {
                     text: 'NEXT',
@@ -250,8 +250,8 @@ export class WhatsNewService {
                 imageHeight: 400,
                 imageBgColor: '#333',
                 imageSrc: './assets/updates/0130/mpv-player.png',
-                title: '🚀 MPV player integration',
-                html: 'Long-awaited mpv player support, which can now be selected from the settings. Before activating the player from the settings page, make sure it is installed on your system. For more details about mvp integration, check the <a target="_blank" href="https://github.com/4gray/iptvnator/wiki/What-is-mpv-video-player-and-how-to-install-it-on-different-operating-systems%3F">wiki page</a>.',
+                title: ' MPV player integration',
+                html: 'Long-awaited mpv player support, which can now be selected from the settings. Before activating the player from the settings page, make sure it is installed on your system. For more details about mvp integration, check the <a target="_blank" href="https://github.com/Fitch86/iptvNT/wiki/What-is-mpv-video-player-and-how-to-install-it-on-different-operating-systems%3F">wiki page</a>.',
                 button: {
                     text: 'YAY',
                     textColor: '#ccc',
@@ -261,7 +261,7 @@ export class WhatsNewService {
         ],
         '0.14.0': [
             {
-                title: '🚀 New in v0.14.0',
+                title: 'New in v0.14.0',
                 html: `The main feature of this release is &mdash; Xtream Code IPTV support. The feature is also available in PWA, but works best in electron version of the application and combination with mpv player.<br />
                 
                 <h3>Other updates:</h3>

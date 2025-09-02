@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
             <p>{{ 'ABOUT.VERSION' | translate }}: {{ appVersion }}</p>
             <p>
                 <a
-                    href="https://github.com/4gray/iptvnator"
+                    href="https://github.com/Fitch86/iptvNT"
                     target="_blank"
                     [title]="'ABOUT.GITHUB_TOOLTIP' | translate"
                     [attr.aria-label]="'ABOUT.GITHUB_TOOLTIP' | translate"
@@ -22,7 +22,7 @@ import { TranslateModule } from '@ngx-translate/core';
                         [title]="'ABOUT.GITHUB_TOOLTIP' | translate" /></a
                 >&nbsp;
                 <a
-                    href="http://twitter.com/share?text=IPTVnator &mdash; free cross-platform IPTV player. Available as PWA and as native application.&url=https://github.com/4gray/iptvnator&hashtags=iptv,m3u,video-player"
+                    href="http://twitter.com/share?text=iptvNT &mdash; free cross-platform IPTV player. Available as PWA and as native application.&url=https://github.com/Fitch86/iptvNT&hashtags=iptv,m3u,video-player"
                     [title]="'ABOUT.TWITTER_TOOLTIP' | translate"
                 >
                     <img
@@ -31,15 +31,6 @@ import { TranslateModule } from '@ngx-translate/core';
                         [title]="'ABOUT.TWITTER_TOOLTIP' | translate"
                     />
                 </a>
-                <a
-                    href="https://github.com/sponsors/4gray"
-                    target="_blank"
-                    [title]="'ABOUT.BUY_ME_A_COFFEE_TOOLTIP' | translate"
-                    [attr.aria-label]="
-                        'ABOUT.BUY_ME_A_COFFEE_TOOLTIP' | translate
-                    "
-                    ><mat-icon>local_cafe</mat-icon></a
-                >
             </p>
         </div>
     `,
