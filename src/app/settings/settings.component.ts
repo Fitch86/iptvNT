@@ -45,6 +45,7 @@ import { DialogService } from '../services/dialog.service';
 import { EpgService } from '../services/epg.service';
 import { PlaylistsService } from '../services/playlists.service';
 import { SettingsStore } from '../services/settings-store.service';
+import { ConfigService } from '../services/config.service';
 import { HeaderComponent } from '../shared/components/header/header.component';
 import * as PlaylistActions from '../state/actions';
 import { selectIsEpgAvailable } from '../state/selectors';
@@ -142,12 +143,14 @@ export class SettingsComponent implements OnInit {
         vlcPlayerPath: '',
         remoteControl: false,
         remoteControlPort: 3000,
+        backendUrl: [''],
     });
 
     /** Form array with epg sources */
     epgUrl = this.settingsForm.get('epgUrl') as FormArray;
 
     private settingsStore = inject(SettingsStore);
+    private configService = inject(ConfigService);
 
     /**
      * Creates an instance of SettingsComponent and injects
@@ -174,8 +177,8 @@ export class SettingsComponent implements OnInit {
      * Reads the config object from the browsers
      * storage (indexed db)
      */
-    ngOnInit(): void {
-        this.setSettings();
+    async ngOnInit(): Promise<void> {
+        await this.setSettings();
         this.checkAppVersion();
     }
 
@@ -185,6 +188,13 @@ export class SettingsComponent implements OnInit {
     setSettings() {
         const currentSettings = this.settingsStore.getSettings();
         this.settingsForm.patchValue(currentSettings);
+
+        // Set current backend URL from ConfigService
+        const localBackendUrl = this.configService.getLocalBackendUrl();
+        this.settingsForm.patchValue({ backendUrl: localBackendUrl || '' });
+
+        // Mark form as pristine after loading saved values
+        this.settingsForm.markAsPristine();
 
         if (this.isTauri && currentSettings.epgUrl) {
             this.setEpgUrls(currentSettings.epgUrl);
@@ -258,42 +268,42 @@ export class SettingsComponent implements OnInit {
      * Triggers on form submit and saves the config object to
      * the indexed db store
      */
-    onSubmit(): void {
-        this.settingsStore.updateSettings(this.settingsForm.value).then(() => {
-            this.applyChangedSettings();
-            this.dataService.sendIpcEvent(
-                SETTINGS_UPDATE,
-                this.settingsForm.value
-            );
+    async onSubmit(): Promise<void> {
+        // Save backend URL to localStorage first
+        const backendUrl = this.settingsForm.value.backendUrl;
+        await this.configService.setLocalBackendUrl(backendUrl);
 
-            this.dataService.sendIpcEvent(
-                SET_MPV_PLAYER_PATH,
-                this.settingsForm.value.mpvPlayerPath
-            );
+        await this.settingsStore.updateSettings(this.settingsForm.value);
+        this.applyChangedSettings();
+        this.dataService.sendIpcEvent(
+            SETTINGS_UPDATE,
+            this.settingsForm.value
+        );
 
-            this.dataService.sendIpcEvent(
-                SET_VLC_PLAYER_PATH,
-                this.settingsForm.value.mpvPlayerPath
-            );
-        });
+        this.dataService.sendIpcEvent(
+            SET_MPV_PLAYER_PATH,
+            this.settingsForm.value.mpvPlayerPath
+        );
+
+        this.dataService.sendIpcEvent(
+            SET_VLC_PLAYER_PATH,
+            this.settingsForm.value.vlcPlayerPath
+        );
+
         if (this.isDialog) {
             this.matDialog.closeAll();
         }
-    }
-
-    /**
-     * Applies the changed settings to the app
-     */
-    applyChangedSettings(): void {
-        this.settingsForm.markAsPristine();
         if (this.isTauri) {
-            let epgUrls = this.settingsForm.value.epgUrl;
-            if (epgUrls) {
-                if (!Array.isArray(epgUrls)) {
-                    epgUrls = [epgUrls];
-                }
-                epgUrls = epgUrls.filter((url) => url !== '');
-                if (epgUrls.length > 0) {
+            const epgUrls = this.settingsForm.value.epgUrl
+                .filter((url: string) => url && url.trim() !== '')
+                .map((url: string) => url.trim());
+
+            if (epgUrls && epgUrls.length > 0) {
+                if (
+                    !this.settingsStore.getSettings().epgUrl ||
+                    JSON.stringify(this.settingsStore.getSettings().epgUrl) !==
+                        JSON.stringify(epgUrls)
+                ) {
                     // Fetch all EPG URLs at once
                     this.epgService.fetchEpg(epgUrls);
                 }
@@ -301,6 +311,7 @@ export class SettingsComponent implements OnInit {
         }
         this.translate.use(this.settingsForm.value.language);
         this.settingsService.changeTheme(this.settingsForm.value.theme);
+        
         this.snackBar.open(
             this.translate.instant('SETTINGS.SETTINGS_SAVED'),
             null,
@@ -309,6 +320,41 @@ export class SettingsComponent implements OnInit {
                 horizontalPosition: 'start',
             }
         );
+        
+        // Mark form as pristine to disable save button
+        this.settingsForm.markAsPristine();
+    }
+
+    /**
+     * Applies the changed settings to the app
+     */
+    applyChangedSettings(): void {
+        if (this.isTauri) {
+            const epgUrls = this.settingsForm.value.epgUrl
+                .filter((url: string) => url && url.trim() !== '')
+                .map((url: string) => url.trim());
+
+            if (epgUrls && epgUrls.length > 0) {
+                if (
+                    !this.settingsStore.getSettings().epgUrl ||
+                    JSON.stringify(this.settingsStore.getSettings().epgUrl) !==
+                        JSON.stringify(epgUrls)
+                ) {
+                    // Fetch all EPG URLs at once
+                    this.epgService.fetchEpg(epgUrls);
+                }
+            }
+        }
+        this.translate.use(this.settingsForm.value.language);
+        this.settingsService.changeTheme(this.settingsForm.value.theme);
+    }
+
+    /**
+     * Clears the backend URL setting
+     */
+    async clearBackendUrl(): Promise<void> {
+        this.settingsForm.patchValue({ backendUrl: '' });
+        await this.configService.clearLocalBackendUrl();
     }
 
     /**

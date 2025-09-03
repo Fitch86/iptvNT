@@ -6,7 +6,13 @@ import { ConfigService } from './config.service';
 })
 export class VideoProxyService {
     private readonly configService = inject(ConfigService);
-    private readonly proxyBaseUrl = this.configService.backendUrl || '/api';
+
+    /**
+     * Get current proxy base URL dynamically
+     */
+    private get proxyBaseUrl(): string {
+        return this.configService.backendUrl || '/api';
+    }
 
     /**
      * Converts a video stream URL to use the tvcors-proxy for streaming

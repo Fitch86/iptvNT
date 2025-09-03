@@ -40,18 +40,57 @@ npm run serve
 
 ### 生产部署
 
-#### 方案1: 静态托管 (推荐)
+#### 方案1: 本地HTTP服务器
 ```bash
 # 构建生产版本
 npm run build:prod
 
-# 将dist/文件夹部署到任何静态托管服务:
-# - Netlify, Vercel, GitHub Pages
-# - Nginx, Apache或任何Web服务器
-# - CDN服务如Cloudflare Pages
+# 全局安装http-server
+npm install -g http-server
+
+# 启动应用服务
+http-server dist/browser -p 8080 -o
+
+# 注意: 本地测试默认配置使用 http://localhost:3001
+# 确保你的tvcors-proxy在3001端口运行
 ```
 
-#### 方案2: Docker部署
+**Windows PowerShell 替代方案:**
+```powershell
+# 设置环境变量
+$env:BACKEND_URL = "http://localhost:3001"
+
+# 构建生产版本
+npm run build:prod
+
+# 为本地测试配置后端URL
+(Get-Content dist/browser/assets/config.json) -replace 'PLACEHOLDER_BACKEND_URL', $env:BACKEND_URL | Set-Content dist/browser/assets/config.json
+
+# 启动应用服务
+http-server dist/browser --port 8080 --cors
+
+# 或使用提供的批处理脚本:
+# .\build-local.bat    # 构建并配置
+# .\start-local.bat    # 启动服务器
+```
+
+#### 方案2: Netlify部署
+1. **设置仓库**: 将代码推送到GitHub
+2. **Netlify配置**: 
+   - 构建命令: `npm run build:prod && sed -i 's|http://localhost:3001|'$BACKEND_URL'|g' dist/browser/assets/config.json`
+   - 发布目录: `dist/browser`
+   - 环境变量: 设置 `BACKEND_URL` 为你的tvcors-proxy URL
+3. **部署**: 将GitHub仓库连接到Netlify
+
+#### 方案3: Cloudflare Pages部署
+1. **设置仓库**: 将代码推送到GitHub
+2. **Cloudflare Pages配置**:
+   - 构建命令: `chmod +x build-cf.sh && ./build-cf.sh`
+   - 构建输出目录: `dist/browser`
+   - 环境变量: 设置 `BACKEND_URL` 为你的tvcors-proxy URL
+3. **部署**: 将GitHub仓库连接到Cloudflare Pages
+
+#### 方案4: Docker部署
 ```bash
 # 构建Docker镜像
 docker build -t iptvnt .
@@ -60,13 +99,21 @@ docker build -t iptvnt .
 docker run -p 80:80 iptvnt
 ```
 
-#### 后端要求
-iptvNT需要tvcors-proxy后端来实现流媒体功能:
-- 克隆并部署 [tvcors-proxy](https://github.com/your-proxy-repo)
-- 在环境设置中配置 `BACKEND_URL`
-- 确保CORS配置正确
-
 ## 📖 使用指南
+
+### 后端URL配置
+iptvNT现在支持在设置页面中配置自定义后端URL:
+
+1. **打开设置**: 点击右上角菜单 → 设置
+2. **配置后端URL**: 在"Backend URL"字段中输入你的tvcors-proxy地址
+   - 例如: `http://localhost:3001` 或 `https://your-backend.com`
+3. **保存设置**: 点击保存按钮
+4. **优先级**: 本地设置 > 环境变量 > 默认配置
+
+**配置优先级说明:**
+- 🥇 **浏览器本地设置** - 在设置页面配置的URL (最高优先级)
+- 🥈 **环境变量** - 开发模式下的环境配置
+- 🥉 **默认配置** - config.json中的配置 (生产环境)
 
 ### 添加播放列表
 1. **通过URL**: 输入播放列表URL和可选的User-Agent头

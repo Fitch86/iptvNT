@@ -67,6 +67,25 @@ http-server dist/browser -p 8080 -o
 # Make sure your tvcors-proxy is running on port 3001
 ```
 
+**Windows PowerShell Alternative:**
+```powershell
+# Set environment variable
+$env:BACKEND_URL = "http://localhost:3001"
+
+# Build for production
+npm run build:prod
+
+# Configure backend URL for local testing
+(Get-Content dist/browser/assets/config.json) -replace 'PLACEHOLDER_BACKEND_URL', $env:BACKEND_URL | Set-Content dist/browser/assets/config.json
+
+# Serve the application
+http-server dist/browser --port 8080 --cors
+
+# Or use the provided batch scripts:
+# .\build-local.bat    # Build and configure
+# .\start-local.bat    # Start server
+```
+
 #### Option 2: Netlify Deployment
 1. **Setup Repository**: Push your code to GitHub
 2. **Netlify Configuration**: 

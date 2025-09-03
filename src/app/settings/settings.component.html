@@ -165,6 +165,35 @@
         <mat-divider />
         <div class="row">
             <div class="column">
+                {{ 'SETTINGS.BACKEND_URL_LABEL' | translate }}
+                <p>{{ 'SETTINGS.BACKEND_URL_DESCRIPTION' | translate }}</p>
+            </div>
+            <div class="column">
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'SETTINGS.BACKEND_URL_PLACEHOLDER' | translate }}</mat-label>
+                    <input
+                        matInput
+                        formControlName="backendUrl"
+                        placeholder="http://localhost:3001"
+                        data-test-id="backend-url-input"
+                    />
+                    <button
+                        mat-icon-button
+                        matSuffix
+                        (click)="clearBackendUrl()"
+                        [attr.aria-label]="'SETTINGS.CLEAR_BACKEND_URL' | translate"
+                        matTooltip="{{ 'SETTINGS.CLEAR_BACKEND_URL' | translate }}"
+                        [style.display]="settingsForm.get('backendUrl')?.value ? 'block' : 'none'"
+                    >
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                    <mat-hint>{{ 'SETTINGS.BACKEND_URL_HINT' | translate }}</mat-hint>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider />
+        <div class="row">
+            <div class="column">
                 {{ 'SETTINGS.SHOW_CAPTIONS' | translate }}
                 <p>{{ 'SETTINGS.SHOW_CAPTIONS_DESCRIPTION' | translate }}</p>
             </div>

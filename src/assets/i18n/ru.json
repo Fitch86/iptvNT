@@ -90,7 +90,12 @@
     "FILTER_BY_TYPE": "Фильтровать по типу",
     "IMPORTED_AS_TEXT": "Импортировано как текст",
     "FILTER_BY_NAME": "Фильтровать по имени",
-    "PARSING_ERROR": "Ошибка парсинга, недействительный плейлист:"
+    "PARSING_ERROR": "Ошибка парсинга, недействительный плейлист:",
+    "BACKEND_URL_LABEL": "URL бэкенда",
+    "BACKEND_URL_DESCRIPTION": "Пользовательский URL сервера бэкенда для прокси-сервисов. Оставьте пустым для использования конфигурации по умолчанию.",
+    "BACKEND_URL_PLACEHOLDER": "Введите URL бэкенда",
+    "BACKEND_URL_HINT": "Пример: http://localhost:3001 или https://your-backend.com",
+    "CLEAR_BACKEND_URL": "Очистить URL бэкенда"
   },
   "SETTINGS": {
     "TITLE": "Настройки / IPTVnator",
