@@ -184,6 +184,8 @@ npm install
 npm run serve
 ```
 
+## [![DeepWiki Index](https://deepwiki.com/badge.svg)](https://deepwiki.com/{org}/{repo})
+
 ## 📄 License
 
 [MIT](LICENSE.md)
