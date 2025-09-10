@@ -1,4 +1,4 @@
-# iptvNT | [![DeepWiki Index](https://deepwiki.com/badge.svg)](https://deepwiki.com/Fitch86/iptvNT)
+# iptvNT  [![DeepWiki Index](https://deepwiki.com/badge.svg)](https://deepwiki.com/Fitch86/iptvNT)
 
 ![iptvNT](https://raw.githubusercontent.com/Fitch86/iptvNT/main/src/assets/icons/icon.png)
 
